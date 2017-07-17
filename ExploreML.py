@@ -7,9 +7,9 @@ import random
 import colorsys
 import Helper
 
-input_size = 128
-output_size = 128
-batch_size = 1
+# input_size = 128
+# output_size = 128
+batch_size = 16
 max_preview_export = 4
 number_generator_filters = 8
 
@@ -362,10 +362,26 @@ def create_generator(current):
     return current
 
 def train():
-    raw_input = tf.placeholder(tf.float32, [batch_size, process_window + (batch_size - 1) + 1, 1])
-    input = raw_input[:, :process_window, :]
-    target = raw_input[:, process_window: process_window + 1, :]
-#     # print(filename_queue)
+    raw_input = tf.placeholder(tf.float32, [process_window + (batch_size - 1) + 1, 1])
+
+    inputs = []
+    targets = []
+
+    for i in range(batch_size):
+        input_local = raw_input[i: i + process_window, :]
+        target_local = raw_input[i + process_window: i + process_window + 1, :]
+
+        input_local = tf.expand_dims(input_local, axis=0)
+        target_local = tf.expand_dims(target_local, axis=0)
+
+        inputs.append(input_local)
+        targets.append(target_local)
+
+    input = tf.concat(inputs, axis=0)
+    target = tf.concat(targets, axis=0)
+    print("input")
+    print(input)
+    print(target)
 #
 #     # input = tf.placeholder(tf.float32, [None, input_size, input_size, 3])
 #     # output = tf.placeholder(tf.float32, [None, output_size, output_size, 3])
@@ -404,8 +420,8 @@ def train():
                     # Left Channel
                     # print("audio.shape " + str(audio.shape))
                     # print("audio.shape " + str(audio.shape))
-                    audio = np.expand_dims(audio, axis=0)
-                    audio = np.expand_dims(audio, axis=2)
+                    # audio = np.expand_dims(audio, axis=0)
+                    audio = np.expand_dims(audio, axis=1)
 
                     # offset = 0
 
@@ -414,8 +430,8 @@ def train():
 
                     # print("shape " + str(offset < audio.shape[1] - process_window - batch_size))
 
-                    for offset in range(0, audio.shape[1] - process_window - batch_size - 1, batch_size):
-                        input_audio = audio[:, offset:process_window + offset + 1, :]
+                    for offset in range(0, audio.shape[0] - process_window - batch_size - 1, batch_size):
+                        input_audio = audio[offset:offset + process_window + batch_size, :]
                         # print("offset " + str(offset))
                         # print(input_audio.shape)
 
