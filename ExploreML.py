@@ -434,6 +434,7 @@ def train():
 
                     # print("shape " + str(offset < audio.shape[1] - process_window - batch_size))
 
+                    i = 0
                     for offset in range(0, audio.shape[0] - process_window - batch_size - 1, batch_size):
                         input_audio = audio[offset:offset + process_window + batch_size, :]
                         # print("offset " + str(offset))
@@ -455,9 +456,11 @@ def train():
                         print("generated_output " + str(values["generated_output"][0, 0, 0]))
                         # print(values["cost"])
 
-                    if i % 500 == 0:
-                        Helper.validate_directory(save_dir)
-                        _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
+                        if i % 500 == 0:
+                            Helper.validate_directory(save_dir)
+                            _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
+
+                        i += 1
 
         #     raw_input
 
