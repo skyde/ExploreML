@@ -5,90 +5,42 @@ from PIL import Image
 import tensorflow as tf
 import random
 import colorsys
-import Helpers
+import Helper
 
 input_size = 128
 output_size = 128
-batch_size = 64
+batch_size = 1
 max_preview_export = 4
-number_generator_filters = 32
+number_generator_filters = 4
+
+max_epochs = 40000
 
 data_source = "data"
 data_contains_name = "piano"
 data_input = "data_input"
 
-def process_data():
-    i = 0
-    for dirName, subdirList, fileList in os.walk(data_source):
-        if data_contains_name is None or data_contains_name in os.path.normpath(dirName):
+process_window = 2**16
 
-            for file_name in fileList:
-                path = dirName + "\\" + file_name
-                path = path.replace('\\', '/')
+# def process_data():
+#     for dir_name, _, file_list in os.walk(data_source):
+#         if data_contains_name is None or data_contains_name in os.path.normpath(dir_name):
+#             for file_name in file_list:
+#                 path = dir_name + "\\" + file_name
+#                 path = path.replace('\\', '/')
+#
+#                 sample_rate, audio = wav.read(path)
+#                 Helper.validate_directory(data_input)
+#                 audio = audio.astype(np.float64)
+#                 audio /= 32768
+#
+#                 print(sample_rate)
+#
+#                 audio *= 32768
+#                 audio = audio.astype(np.int16)
+#                 wav.write(data_input + "\\" + file_name, sample_rate, audio)
 
-                print(path)
-                sample_rate, audio = wav.read(path)
-                # print(audio)
-                Helpers.validate_directory(data_input)
-                # print(audio.shape)
-                # for i in range(audio.shape[0]):
-                #     print(audio[i])
-                audio = audio.astype(np.float64)
-                audio /= 32768
-                # audio *= 0.1
-                # audio = np.sin(audio * 3.1415 * 2 * 4)
-                audio *= 32768
-                # audio *= 0.2
-                audio = audio.astype(np.int16)
-                # audio = audio.astype(np.float64)
-                wav.write(data_input + "\\" + file_name, sample_rate, audio)
-            #     image = Image.open(imagePath)
-            #
-            #     if image.width > output_size and image.height > output_size:
-            #
-            #         output_dir = data_train
-            #
-            #         if i % 5 == 0:
-            #             output_dir = data_test
-            #
-            #         validate_directory(output_dir)
-            #         # validate_directory(output_dir + "/output")
-            #         # validate_directory(output_dir + "/input")
-            #         dim = min(image.size[0], image.size[1])
-            #         x = image.size[0] / 2 - dim / 2
-            #         y = image.size[1] / 2 - dim / 2
-            #         image = image.crop((x, y, dim + x, dim + y))
-            #
-            #         output = image.resize((output_size, output_size), Image.ANTIALIAS)
-            #         output = output.convert('RGB')
-            #
-            #         input = image.resize((input_size, input_size), Image.ANTIALIAS)
-            #         input = input.convert('RGB')
-            #
-            #         if input_transform == "grayscale":
-            #             input = input.convert('L')
-            #             # input = input.convert('L').point(lambda x: 0 if x < 128 else 255, '1')
-            #
-            #         combine = Image.new('RGB', (input_size + output_size, max(input_size, output_size)))
-            #         combine.paste(input, (0, 0))
-            #         combine.paste(output, (input_size, 0))
-            #
-            #         save_path = output_dir + '/' + path
-            #         save_path = save_path.replace(".jpg", ".png")
-            #         save_path = save_path.replace(".jpeg", ".png")
-            #
-            #         print(save_path)
-            #         combine.save(save_path)
-            #
-            #         i += 1
+# process_data()
 
-process_data()
-
-# def selu(x):
-#     with tf.variable_scope('elu') as scope:
-#         alpha = 1.6732632423543772848170429916717
-#         scale = 1.0507009873554804934193349852946
-#         return scale * tf.where(x >= 0.0, x, alpha * tf.nn.elu(x))
 #
 #
 # def lrelu(x, leak=0.2, name="lrelu"):
@@ -98,29 +50,23 @@ process_data()
 #         return f1 * x + f2 * abs(x)
 #
 #
-# def conv(batch_input, out_channels, stride=1, reuse=False, activation="selu"):
-#     current = batch_input
-#
-#     with tf.variable_scope("conv", reuse=reuse):
-#         in_channels = current.get_shape()[3]
-#         filter = tf.get_variable("filter", [4, 4, in_channels, out_channels], dtype=tf.float32,
-#                                  initializer=tf.random_normal_initializer(0, 0.02))
-#         # [batch, in_height, in_width, in_channels], [filter_width, filter_height, in_channels, out_channels]
-#         #     => [batch, out_height, out_width, out_channels]
-#         current = tf.nn.conv2d(current, filter, [1, stride, stride, 1], padding="SAME")
-#
-#         w = tf.get_variable("encoderBias", [1, 1, 1, out_channels], dtype=tf.float32,
-#                             initializer=tf.random_normal_initializer(0, 0.02))
-#
-#         before_activation = current
-#
-#         if activation == "selu":
-#             current = selu(current + w)
-#             # current = lrelu(current + w, leak=0.3)
-#
-#             # current = tf.nn.local_response_normalization(current)
-#
-#     return current, before_activation
+def conv(batch_input, out_channels, stride=2, activation="selu"):
+    current = batch_input
+
+    in_channels = current.get_shape()[2]
+    filter = tf.get_variable("filter", [4, in_channels, out_channels], dtype=tf.float32,
+                             initializer=tf.random_normal_initializer(0, 0.02))
+    # [batch, in_size, in_channels], [filter_size, in_channels, out_channels]
+    #     => [batch, out_size, out_channels]
+    current = tf.nn.conv1d(current, filter, stride, padding="SAME")
+
+    w = tf.get_variable("encoder_bias", [1, 1, out_channels], dtype=tf.float32,
+                        initializer=tf.random_normal_initializer(0, 0.02))
+
+    if activation == "selu":
+        current = Helper.selu(current + w)
+
+    return current
 #
 #
 # def deconv(current, out_channels, reuse=False, activation="selu"):
@@ -399,17 +345,108 @@ process_data()
 #         saveImage(images[v, :, :, :], image_path, rescale_space=rescale_space)
 #
 #
-# def train():
+
+def create_generator(current):
+    print(current.shape)
+
+    i = 0
+    while current.shape[1] > 1:
+        with tf.variable_scope("conv_" + str(i)):
+            depth = min(8 * number_generator_filters, 4 + i * number_generator_filters / 2)
+            if current.shape[1] == 2:
+                depth = 1
+            current = conv(current, depth)
+            print(current.shape)
+        i += 1
+
+    return current
+
+def train():
+    raw_input = tf.placeholder(tf.float32, [batch_size, process_window + (batch_size - 1) + 1, 1])
+    input = raw_input[:, :process_window, :]
+    target = raw_input[:, process_window: process_window + 1, :]
 #     # print(filename_queue)
 #
 #     # input = tf.placeholder(tf.float32, [None, input_size, input_size, 3])
 #     # output = tf.placeholder(tf.float32, [None, output_size, output_size, 3])
 #
-#     with tf.Session() as sess:
-#
+    current = create_generator(input)
+    current = tf.tanh(current)
+
+    generated_output = current
+
+    loss = tf.reduce_mean(tf.abs(generated_output - target))
+    global_step = tf.contrib.framework.get_or_create_global_step()
+    train_step = tf.train.AdamOptimizer(0.001).minimize(loss, global_step=global_step)
+
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+
+        while global_step.eval() < max_epochs:
+            for dir_name, _, file_list in os.walk(data_input):
+                for file_name in file_list:
+                    path = dir_name + "\\" + file_name
+                    path = path.replace('\\', '/')
+
+                    step = global_step.eval()
+
+                    print("step " + str(step))
+
+                    sample_rate, audio = wav.read(path)
+                    audio = audio[:, 0]
+                    audio = audio.astype(np.float32)
+                    audio /= 32768
+                    # audio = audio * 2.0 - 1.0
+                    audio *= 20
+                    # print("max " + str(np.max(audio)))
+                    # print("min " + str(np.min(audio)))
+
+                    # Left Channel
+                    # print("audio.shape " + str(audio.shape))
+                    # print("audio.shape " + str(audio.shape))
+                    audio = np.expand_dims(audio, axis=0)
+                    audio = np.expand_dims(audio, axis=2)
+
+                    # offset = 0
+
+                    # print(audio.shape)
+                    # print(audio)
+
+                    # print("shape " + str(offset < audio.shape[1] - process_window - batch_size))
+
+                    for offset in range(0, audio.shape[1] - process_window - batch_size - 1, batch_size):
+                        input_audio = audio[:, offset:process_window + offset + 1, :]
+                        print("offset " + str(offset))
+                        # print(input_audio.shape)
+
+                        # train_step.run(feed_dict={raw_input: input_audio})
+                        values = sess.run({
+                            "train_step": train_step,
+                            "global_step": global_step,
+                            "loss": loss,
+                            "input": input,
+                            "target": target,
+                            "generated_output": generated_output
+                        }, feed_dict={raw_input: input_audio})
+
+                        # print("loss " + str(values["loss"]))
+                        print("input " + str(values["input"]))
+                        print("target " + str(values["target"][0, 0, 0]))
+                        print("generated_output " + str(values["generated_output"][0, 0, 0]))
+                        # print(values["cost"])
+
+        #     raw_input
+
+
+        # train_value, global_step_value = sess.run({
+        #     "train": train_group,
+        #     "global_step": global_step
+        # }, feed_dict={state: "train"})
+
 #         state = tf.placeholder(tf.string)
 #
-#         with tf.variable_scope("input"):
+        # with tf.variable_scope("input"):
+
 #             train_images = load_images(data_train, output_size, input_size + output_size)
 #             test_images = load_images(data_test, output_size, input_size + output_size)
 #             # output_images, output_filenames = load_images(data_train + "/output", output_size)
@@ -682,4 +719,4 @@ process_data()
 
 
 # generate_data_shapes()
-# train()
+train()
