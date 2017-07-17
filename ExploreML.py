@@ -9,7 +9,7 @@ import Helper
 
 # input_size = 128
 # output_size = 128
-batch_size = 16
+batch_size = 512
 max_preview_export = 4
 number_generator_filters = 8
 
@@ -18,6 +18,8 @@ max_epochs = 40000
 data_source = "data"
 data_contains_name = "piano"
 data_input = "data_input"
+
+save_dir = "save"
 
 process_window = 2**16
 
@@ -398,6 +400,8 @@ def train():
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
+        saver = tf.train.Saver(max_to_keep=4, keep_checkpoint_every_n_hours=1)
+
         while global_step.eval() < max_epochs:
             for dir_name, _, file_list in os.walk(data_input):
                 for file_name in file_list:
@@ -450,6 +454,10 @@ def train():
                         print("target " + str(values["target"][0, 0, 0]))
                         print("generated_output " + str(values["generated_output"][0, 0, 0]))
                         # print(values["cost"])
+
+                    if i % 500 == 0:
+                        Helper.validate_directory(save_dir)
+                        _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
 
         #     raw_input
 
