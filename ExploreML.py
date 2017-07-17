@@ -11,7 +11,7 @@ input_size = 128
 output_size = 128
 batch_size = 1
 max_preview_export = 4
-number_generator_filters = 4
+number_generator_filters = 8
 
 max_epochs = 40000
 
@@ -371,7 +371,7 @@ def train():
 #     # output = tf.placeholder(tf.float32, [None, output_size, output_size, 3])
 #
     current = create_generator(input)
-    current = tf.tanh(current)
+    # current = tf.tanh(current)
 
     generated_output = current
 
@@ -416,7 +416,7 @@ def train():
 
                     for offset in range(0, audio.shape[1] - process_window - batch_size - 1, batch_size):
                         input_audio = audio[:, offset:process_window + offset + 1, :]
-                        print("offset " + str(offset))
+                        # print("offset " + str(offset))
                         # print(input_audio.shape)
 
                         # train_step.run(feed_dict={raw_input: input_audio})
@@ -429,8 +429,8 @@ def train():
                             "generated_output": generated_output
                         }, feed_dict={raw_input: input_audio})
 
-                        # print("loss " + str(values["loss"]))
-                        print("input " + str(values["input"]))
+                        print("loss " + str(values["loss"]))
+                        # print("input " + str(values["input"]))
                         print("target " + str(values["target"][0, 0, 0]))
                         print("generated_output " + str(values["generated_output"][0, 0, 0]))
                         # print(values["cost"])
