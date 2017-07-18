@@ -9,9 +9,9 @@ import Helper
 
 # input_size = 128
 # output_size = 128
-batch_size = 512
+batch_size = 1024
 max_preview_export = 4
-number_generator_filters = 8
+number_generator_filters = 16
 
 max_epochs = 40000
 
@@ -21,8 +21,8 @@ data_input = "data_input"
 
 save_dir = "save"
 preview_dir = "preview"
-train_from_scratch = True
-save_progress = False
+train_from_scratch = False
+save_progress = True
 
 process_window = 2**16
 preview_length = process_window
@@ -493,22 +493,22 @@ def train():
                             "summary": summary_merged
                         }, feed_dict={raw_input: input_audio})
 
-                        writer.add_summary(values["summary"], step)
+                        if step % 10 == 0:
+                            writer.add_summary(values["summary"], step)
 
-                        print("loss " + str(values["loss"]))
-                        # print("input " + str(values["input"]))
-                        print("target " + str(values["target"][0, 0, 0]))
-                        print("generated_output " + str(values["generated_output"][0, 0, 0]))
+                            print("loss " + str(values["loss"]))
+                            print("target " + str(values["target"][0, 0, 0]))
+                            print("generated_output " + str(values["generated_output"][0, 0, 0]))
                         # print(values["cost"])
 
-                        # if i % 10 == 0:
                         #     writer.add_summary(summary, step)
 
-                        if step % 500 == 0:
+                        if step % 200 == 0:
                             Helper.validate_directory(save_dir)
                             if save_progress:
                                 _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
 
+                        if step > 150 and i % 200 == 0:
                             preview_start_offset = 12 * 22400
                             preview_audio = audio[preview_start_offset: preview_start_offset + process_window, :]
 
