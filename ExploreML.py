@@ -10,9 +10,9 @@ import math
 
 # input_size = 128
 # output_size = 128
-batch_size = 512
+batch_size = 256
 max_preview_export = 4
-number_generator_filters = 64
+number_generator_filters = 32
 
 max_epochs = 40000
 
@@ -384,7 +384,7 @@ def caculate_layer_depth(size):
     # math.factorial()
 
     index = math.log(process_window, 2) - math.log(size, 2)
-    return min(8, index ** 2) * number_generator_filters
+    return min(8, (index - 1) ** 2 / 4) * number_generator_filters
 
 def create_generator(current, dropout=True):
     print(current.shape)
