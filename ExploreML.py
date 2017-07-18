@@ -10,9 +10,9 @@ import math
 
 # input_size = 128
 # output_size = 128
-batch_size = 256
+batch_size = 128
 max_preview_export = 4
-number_generator_filters = 32
+number_generator_filters = 4
 
 max_epochs = 40000
 
@@ -25,9 +25,9 @@ preview_dir = "preview"
 train_from_scratch = True
 save_progress = True
 
-process_window = 2**16
+process_window = 2**15
 preview_length = process_window
-layer_scale = 4
+layer_scale = 2
 
 save_interval = 500
 preview_interval = 400
@@ -62,7 +62,7 @@ preview_interval = 400
 #         return f1 * x + f2 * abs(x)
 #
 #
-def conv(batch_input, out_channels, stride=4, activation="selu"):
+def conv(batch_input, out_channels, stride=2, activation="selu"):
     current = batch_input
 
     in_channels = current.get_shape()[2]
@@ -384,7 +384,8 @@ def caculate_layer_depth(size):
     # math.factorial()
 
     index = math.log(process_window, 2) - math.log(size, 2)
-    return min(8, (index - 1) ** 2 / 4) * number_generator_filters
+    print(index)
+    return int((index ** 1.5) * number_generator_filters)
 
 def create_generator(current, dropout=True):
     print(current.shape)
@@ -454,7 +455,7 @@ def train():
     with tf.variable_scope("generator", reuse = True):
         preview_input = tf.placeholder(tf.float32, [process_window, 1])
         expanded_input = tf.expand_dims(preview_input, axis=0)
-        preview_output = create_generator(expanded_input, dropout=False)
+        preview_output = create_generator(expanded_input, dropout=True)
 
     generated_output = current
 
