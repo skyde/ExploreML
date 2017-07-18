@@ -362,7 +362,7 @@ def conv(batch_input, out_channels, stride=4, activation="selu"):
 #
 #
 
-def create_generator(current):
+def create_generator(current, dropout=True):
     print(current.shape)
 
     i = 0
@@ -372,6 +372,8 @@ def create_generator(current):
             if current.shape[1] == 4:
                 depth = 1
             current = conv(current, depth)
+            if dropout:
+                current = tf.nn.dropout(current, 0.4)
             print(current.shape)
         i += 1
 
@@ -411,7 +413,7 @@ def train():
     with tf.variable_scope("generator", reuse = True):
         preview_input = tf.placeholder(tf.float32, [process_window, 1])
         expanded_input = tf.expand_dims(preview_input, axis=0)
-        preview_output = create_generator(expanded_input)
+        preview_output = create_generator(expanded_input, dropout=False)
 
     generated_output = current
 
@@ -503,12 +505,12 @@ def train():
 
                         #     writer.add_summary(summary, step)
 
-                        if step % 200 == 0:
+                        if step % 400 == 0:
                             Helper.validate_directory(save_dir)
                             if save_progress:
                                 _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
 
-                        if step > 150 and i % 200 == 0:
+                        if step > 0 and step % 400 == 0:
                             preview_start_offset = 12 * 22400
                             preview_audio = audio[preview_start_offset: preview_start_offset + process_window, :]
 
