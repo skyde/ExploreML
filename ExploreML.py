@@ -20,6 +20,8 @@ data_contains_name = "piano"
 data_input = "data_input"
 
 save_dir = "save"
+train_from_scratch = True
+save_progress = False
 
 process_window = 2**16
 
@@ -52,17 +54,26 @@ process_window = 2**16
 #         return f1 * x + f2 * abs(x)
 #
 #
-def conv(batch_input, out_channels, stride=2, activation="selu"):
+def conv(batch_input, out_channels, stride=4, activation="selu"):
     current = batch_input
 
     in_channels = current.get_shape()[2]
-    filter = tf.get_variable("filter", [4, in_channels, out_channels], dtype=tf.float32,
+    filter = tf.get_variable("filter", [16, in_channels, out_channels], dtype=tf.float32,
                              initializer=tf.random_normal_initializer(0, 0.02))
     # [batch, in_size, in_channels], [filter_size, in_channels, out_channels]
     #     => [batch, out_size, out_channels]
+    # tf.nn.
+    # tf.nn.
+    # tf.nn.
     current = tf.nn.conv1d(current, filter, stride, padding="SAME")
+    values = []
+    # for i in range(in_channels / 2):
+    #     with tf.variable_scope("filter_" + i):
+    #         filter = tf.get_variable("filter", [1, current.shape[1], out_channels], dtype=tf.float32,
+    #                                 initializer=tf.random_normal_initializer(0, 0.02))
+    #     values.append()
 
-    w = tf.get_variable("encoder_bias", [1, 1, out_channels], dtype=tf.float32,
+    w = tf.get_variable("encoder_bias", [1, current.shape[1], out_channels], dtype=tf.float32,
                         initializer=tf.random_normal_initializer(0, 0.02))
 
     if activation == "selu":
@@ -363,6 +374,9 @@ def create_generator(current):
 
     return current
 
+# def save_preview(sess, audio):
+
+
 def train():
     raw_input = tf.placeholder(tf.float32, [process_window + (batch_size - 1) + 1, 1])
 
@@ -398,19 +412,34 @@ def train():
     train_step = tf.train.AdamOptimizer(0.001).minimize(loss, global_step=global_step)
 
     with tf.Session() as sess:
+
+        # Summary
+        with tf.name_scope("summary"):
+            tf.summary.scalar("loss", loss)
+        #     tf.summary.image("generated_output", generated_output)
+        #     tf.summary.image("output", output)
+        #     tf.summary.scalar("gen_loss_L1", gen_loss_L1)
+        #     tf.summary.scalar("gen_loss_GAN", gen_loss_GAN)
+        #     tf.summary.scalar("discriminator_loss", discriminator_loss)
+
+        summary_merged = tf.summary.merge_all()
+
+        writer = tf.summary.FileWriter(save_dir, graph=sess.graph)
+
         sess.run(tf.global_variables_initializer())
 
         saver = tf.train.Saver(max_to_keep=4, keep_checkpoint_every_n_hours=1)
+
+        latest_checkpoint = tf.train.latest_checkpoint(save_dir)
+        if latest_checkpoint is not None and not train_from_scratch:
+            print("Loading checkpoint " + latest_checkpoint)
+            saver.restore(sess, latest_checkpoint)
 
         while global_step.eval() < max_epochs:
             for dir_name, _, file_list in os.walk(data_input):
                 for file_name in file_list:
                     path = dir_name + "\\" + file_name
                     path = path.replace('\\', '/')
-
-                    step = global_step.eval()
-
-                    print("step " + str(step))
 
                     sample_rate, audio = wav.read(path)
                     audio = audio[:, 0]
@@ -434,8 +463,12 @@ def train():
 
                     # print("shape " + str(offset < audio.shape[1] - process_window - batch_size))
 
-                    i = 0
+                    # i = 0
                     for offset in range(0, audio.shape[0] - process_window - batch_size - 1, batch_size):
+
+                        step = global_step.eval()
+                        print("step " + str(step))
+
                         input_audio = audio[offset:offset + process_window + batch_size, :]
                         # print("offset " + str(offset))
                         # print(input_audio.shape)
@@ -447,8 +480,11 @@ def train():
                             "loss": loss,
                             "input": input,
                             "target": target,
-                            "generated_output": generated_output
+                            "generated_output": generated_output,
+                            "summary": summary_merged
                         }, feed_dict={raw_input: input_audio})
+
+                        writer.add_summary(values["summary"], step)
 
                         print("loss " + str(values["loss"]))
                         # print("input " + str(values["input"]))
@@ -456,11 +492,19 @@ def train():
                         print("generated_output " + str(values["generated_output"][0, 0, 0]))
                         # print(values["cost"])
 
-                        if i % 500 == 0:
+                        # if i % 10 == 0:
+                        #     writer.add_summary(summary, step)
+
+                        if step % 500 == 0 and save_progress:
                             Helper.validate_directory(save_dir)
                             _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
 
-                        i += 1
+                            # Save Preview
+                            # preview = audio[]
+                            # save_preview(sess, audio)
+
+
+                        # i += 1
 
         #     raw_input
 
