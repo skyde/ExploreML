@@ -6,12 +6,13 @@ import tensorflow as tf
 import random
 import colorsys
 import Helper
+import math
 
 # input_size = 128
 # output_size = 128
-batch_size = 1024
+batch_size = 512
 max_preview_export = 4
-number_generator_filters = 16
+number_generator_filters = 64
 
 max_epochs = 40000
 
@@ -21,11 +22,15 @@ data_input = "data_input"
 
 save_dir = "save"
 preview_dir = "preview"
-train_from_scratch = False
+train_from_scratch = True
 save_progress = True
 
 process_window = 2**16
 preview_length = process_window
+layer_scale = 4
+
+save_interval = 500
+preview_interval = 400
     # 2 * 22400
 
 # def process_data():
@@ -65,16 +70,30 @@ def conv(batch_input, out_channels, stride=4, activation="selu"):
                              initializer=tf.random_normal_initializer(0, 0.02))
     # [batch, in_size, in_channels], [filter_size, in_channels, out_channels]
     #     => [batch, out_size, out_channels]
-    # tf.nn.
-    # tf.nn.
-    # tf.nn.
     current = tf.nn.conv1d(current, filter, stride, padding="SAME")
-    values = []
+    # values = []
     # for i in range(in_channels / 2):
     #     with tf.variable_scope("filter_" + i):
     #         filter = tf.get_variable("filter", [1, current.shape[1], out_channels], dtype=tf.float32,
     #                                 initializer=tf.random_normal_initializer(0, 0.02))
     #     values.append()
+
+    w = tf.get_variable("encoder_bias", [1, current.shape[1], out_channels], dtype=tf.float32,
+                        initializer=tf.random_normal_initializer(0, 0.02))
+
+    if activation == "selu":
+        current = Helper.selu(current + w)
+
+    return current
+
+def deconv(batch_input, out_channels, stride=4, activation="selu"):
+    current = batch_input
+
+    in_channels = current.get_shape()[2]
+    filter = tf.get_variable("filter", [16, in_channels, out_channels], dtype=tf.float32,
+                             initializer=tf.random_normal_initializer(0, 0.02))
+
+    current = tf.nn.conv2d_transpose(current, filter, stride, padding="SAME")
 
     w = tf.get_variable("encoder_bias", [1, current.shape[1], out_channels], dtype=tf.float32,
                         initializer=tf.random_normal_initializer(0, 0.02))
@@ -361,6 +380,11 @@ def conv(batch_input, out_channels, stride=4, activation="selu"):
 #         saveImage(images[v, :, :, :], image_path, rescale_space=rescale_space)
 #
 #
+def caculate_layer_depth(size):
+    # math.factorial()
+
+    index = math.log(process_window, 2) - math.log(size, 2)
+    return min(8, index ** 2) * number_generator_filters
 
 def create_generator(current, dropout=True):
     print(current.shape)
@@ -368,8 +392,9 @@ def create_generator(current, dropout=True):
     i = 0
     while current.shape[1] > 1:
         with tf.variable_scope("conv_" + str(i)):
-            depth = min(8 * number_generator_filters, 4 + i * number_generator_filters / 2)
-            if current.shape[1] == 4:
+            depth = caculate_layer_depth(int(current.shape[1]) / layer_scale)
+            # depth = min(8 * number_generator_filters, 4 + i * number_generator_filters / 2)
+            if current.shape[1] == layer_scale:
                 depth = 1
             current = conv(current, depth)
             if dropout:
@@ -379,6 +404,22 @@ def create_generator(current, dropout=True):
 
     return current
 
+def create_decoder(current, dropout=False):
+    print(current.shape)
+
+    i = 0
+    while current.shape[1] < process_window:
+        with tf.variable_scope("deconv_" + str(i)):
+            depth = caculate_layer_depth(int(current.shape[1]) * layer_scale)
+            if current.shape[1] * layer_scale == process_window:
+                depth = 1
+            current = deconv(current, depth)
+            if dropout:
+                current = tf.nn.dropout(current, 0.4)
+            print(current.shape)
+        i += 1
+
+    return current
 # def save_preview(sess, audio):
 
 
@@ -505,12 +546,12 @@ def train():
 
                         #     writer.add_summary(summary, step)
 
-                        if step % 400 == 0:
+                        if step % save_interval == 0:
                             Helper.validate_directory(save_dir)
                             if save_progress:
                                 _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
 
-                        if step > 0 and step % 400 == 0:
+                        if step > 0 and step % preview_interval == 0:
                             preview_start_offset = 12 * 22400
                             preview_audio = audio[preview_start_offset: preview_start_offset + process_window, :]
 
