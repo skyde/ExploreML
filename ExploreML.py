@@ -20,10 +20,13 @@ data_contains_name = "piano"
 data_input = "data_input"
 
 save_dir = "save"
+preview_dir = "preview"
 train_from_scratch = True
 save_progress = False
 
 process_window = 2**16
+preview_length = process_window
+    # 2 * 22400
 
 # def process_data():
 #     for dir_name, _, file_list in os.walk(data_source):
@@ -366,7 +369,7 @@ def create_generator(current):
     while current.shape[1] > 1:
         with tf.variable_scope("conv_" + str(i)):
             depth = min(8 * number_generator_filters, 4 + i * number_generator_filters / 2)
-            if current.shape[1] == 2:
+            if current.shape[1] == 4:
                 depth = 1
             current = conv(current, depth)
             print(current.shape)
@@ -402,8 +405,13 @@ def train():
 #     # input = tf.placeholder(tf.float32, [None, input_size, input_size, 3])
 #     # output = tf.placeholder(tf.float32, [None, output_size, output_size, 3])
 #
-    current = create_generator(input)
-    # current = tf.tanh(current)
+    with tf.variable_scope("generator"):
+        current = create_generator(input)
+
+    with tf.variable_scope("generator", reuse = True):
+        preview_input = tf.placeholder(tf.float32, [process_window, 1])
+        expanded_input = tf.expand_dims(preview_input, axis=0)
+        preview_output = create_generator(expanded_input)
 
     generated_output = current
 
@@ -444,9 +452,10 @@ def train():
                     sample_rate, audio = wav.read(path)
                     audio = audio[:, 0]
                     audio = audio.astype(np.float32)
-                    audio /= 32768
+                    audio /= 32768.0
                     # audio = audio * 2.0 - 1.0
-                    audio *= 20
+                    audio_scalar = 20.0
+                    audio *= audio_scalar
                     # print("max " + str(np.max(audio)))
                     # print("min " + str(np.min(audio)))
 
@@ -495,15 +504,34 @@ def train():
                         # if i % 10 == 0:
                         #     writer.add_summary(summary, step)
 
-                        if step % 500 == 0 and save_progress:
+                        if step % 500 == 0:
                             Helper.validate_directory(save_dir)
-                            _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
+                            if save_progress:
+                                _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
 
-                            # Save Preview
-                            # preview = audio[]
-                            # save_preview(sess, audio)
+                            preview_start_offset = 12 * 22400
+                            preview_audio = audio[preview_start_offset: preview_start_offset + process_window, :]
 
+                            for preview_index in range(process_window):
+                                if preview_index % 1000 == 0:
+                                    percent = float(preview_index) / float(preview_length)
+                                    percent = int(percent * 100)
+                                    print("Rendering Preview " + str(percent) + "%")
+                                values = sess.run({
+                                    "output": preview_output
+                                }, feed_dict={preview_input: preview_audio})
 
+                                output_value = values["output"][0, :, :]
+                                preview_audio = np.append(preview_audio, output_value, axis=0)
+                                preview_audio = preview_audio[1:, :]
+
+                            preview_audio *= 32768.0 / audio_scalar
+                            preview_audio = preview_audio.astype(np.int16)
+
+                            Helper.validate_directory(preview_dir)
+                            wav.write(preview_dir + "\\preview_" + str(step) + ".wav", sample_rate, preview_audio)
+
+                            print(preview_audio)
                         # i += 1
 
         #     raw_input
