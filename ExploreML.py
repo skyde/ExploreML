@@ -10,7 +10,7 @@ import math
 
 # input_size = 128
 # output_size = 128
-batch_size = 128
+batch_size = 256
 max_preview_export = 4
 number_generator_filters = 4
 
@@ -27,10 +27,10 @@ save_progress = True
 
 process_window = 2**15
 preview_length = process_window
-layer_scale = 2
+layer_scale = 8
 
 save_interval = 500
-preview_interval = 100
+preview_interval = 1000
     # 2 * 22400
 
 # def process_data():
@@ -62,11 +62,11 @@ preview_interval = 100
 #         return f1 * x + f2 * abs(x)
 #
 #
-def conv(batch_input, out_channels, stride=2, activation="selu"):
+def conv(batch_input, out_channels, stride=8, activation="selu"):
     current = batch_input
 
     in_channels = current.get_shape()[2]
-    filter = tf.get_variable("filter", [4, in_channels, out_channels], dtype=tf.float32,
+    filter = tf.get_variable("filter", [32, in_channels, out_channels], dtype=tf.float32,
                              initializer=tf.random_normal_initializer(0, 0.02))
     # [batch, in_size, in_channels], [filter_size, in_channels, out_channels]
     #     => [batch, out_size, out_channels]
@@ -398,7 +398,7 @@ def caculate_layer_depth(size):
 
     index = math.log(process_window, 2) - math.log(size, 2)
     # print(index)
-    return int((index ** 2) * number_generator_filters)
+    return int((16 + (index - 1) ** 2) * number_generator_filters)
 
 def create_generator(current, dropout=True, output_depth=None):
     print(current.shape)
@@ -467,7 +467,7 @@ def train():
     input = tf.concat(inputs, axis=0)
     target = tf.concat(targets, axis=0)
 
-    target = input
+    # target = input
 
     print("input " + str(input))
     print("target " + str(target))
@@ -476,16 +476,16 @@ def train():
 #     # output = tf.placeholder(tf.float32, [None, output_size, output_size, 3])
 #
     with tf.variable_scope("generator"):
-        current = create_generator(input)
+        current = create_generator(input, output_depth=1)
         print("generator " + str(current))
-        current = create_decoder(current)
-        print("decoder " + str(current))
+        # current = create_decoder(current)
+        # print("decoder " + str(current))
 
     with tf.variable_scope("generator", reuse=True):
         preview_input = tf.placeholder(tf.float32, [process_window, 1])
         expanded_input = tf.expand_dims(preview_input, axis=0)
-        preview_output = create_generator(expanded_input, dropout=True)
-        preview_output = create_decoder(preview_output)
+        preview_output = create_generator(expanded_input, dropout=False, output_depth=1)
+        # preview_output = create_decoder(preview_output)
 
     generated_output = current
 
@@ -554,7 +554,8 @@ def train():
                         step = global_step.eval()
                         print("step " + str(step))
 
-                        input_audio = audio[offset:offset + process_window + batch_size, :]
+                        input_audio = np.copy(audio)
+                        input_audio = input_audio[offset:offset + process_window + batch_size, :]
                         # print("offset " + str(offset))
                         # print(input_audio.shape)
 
@@ -593,38 +594,40 @@ def train():
                             filename = "preview_" + str(step)
                             save_audio(preview_audio, preview_dir, filename + " 0 input", sample_rate)
 
-                            values = sess.run({
-                                "output": preview_output
-                            }, feed_dict={preview_input: preview_audio})
+                        #     values = sess.run({
+                        #         "output": preview_output
+                        #     }, feed_dict={preview_input: preview_audio})
+                        #
+                        #     preview_audio = values["output"][0, :, :]
+                        #
+                        #     save_audio(preview_audio, preview_dir, "preview_" + str(step) + " 1 generated", sample_rate)
 
-                            preview_audio = values["output"][0, :, :]
+
+
+
+
+                            for preview_index in range(process_window):
+                                if preview_index % 1000 == 0:
+                                    percent = float(preview_index) / float(preview_length)
+                                    percent = int(percent * 100)
+                                    print("Rendering Preview " + str(percent) + "%")
+                                values = sess.run({
+                                    "output": preview_output
+                                }, feed_dict={preview_input: preview_audio})
+
+                                output_value = values["output"][0, :, :]
+                                preview_audio = np.append(preview_audio, output_value, axis=0)
+                                preview_audio = preview_audio[1:, :]
 
                             save_audio(preview_audio, preview_dir, "preview_" + str(step) + " 1 generated", sample_rate)
 
-
-
-
-
-                            # for preview_index in range(process_window):
-                            #     if preview_index % 1000 == 0:
-                            #         percent = float(preview_index) / float(preview_length)
-                            #         percent = int(percent * 100)
-                            #         print("Rendering Preview " + str(percent) + "%")
-                            #     values = sess.run({
-                            #         "output": preview_output
-                            #     }, feed_dict={preview_input: preview_audio})
-                            #
-                            #     output_value = values["output"][0, :, :]
-                            #     preview_audio = np.append(preview_audio, output_value, axis=0)
-                            #     preview_audio = preview_audio[1:, :]
-                            #
                             # preview_audio *= 32768.0 / audio_scalar
                             # preview_audio = preview_audio.astype(np.int16)
                             #
                             # Helper.validate_directory(preview_dir)
                             # wav.write(preview_dir + "\\preview_" + str(step) + ".wav", sample_rate, preview_audio)
-                            #
-                            # print(preview_audio)
+
+                            print(preview_audio)
 
 
 
