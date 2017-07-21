@@ -33,23 +33,54 @@ save_interval = 500
 preview_interval = 1000
     # 2 * 22400
 
-# def process_data():
-#     for dir_name, _, file_list in os.walk(data_source):
-#         if data_contains_name is None or data_contains_name in os.path.normpath(dir_name):
-#             for file_name in file_list:
-#                 path = dir_name + "\\" + file_name
-#                 path = path.replace('\\', '/')
-#
-#                 sample_rate, audio = wav.read(path)
-#                 Helper.validate_directory(data_input)
-#                 audio = audio.astype(np.float64)
-#                 audio /= 32768
-#
-#                 print(sample_rate)
-#
-#                 audio *= 32768
-#                 audio = audio.astype(np.int16)
-#                 wav.write(data_input + "\\" + file_name, sample_rate, audio)
+def process_data():
+    for dir_name, _, file_list in os.walk(data_source):
+        if data_contains_name is None or data_contains_name in os.path.normpath(dir_name):
+            for file_name in file_list:
+                path = dir_name + "\\" + file_name
+                path = path.replace('\\', '/')
+
+                sample_rate, audio = wav.read(path)
+                Helper.validate_directory(data_input)
+                audio = audio.astype(np.float64)
+                audio /= 32768
+                audio = audio[:, 0:1]
+                # input_size = 1024
+                audio = audio[0:512, 0]
+
+                input = tf.placeholder(tf.float32, [audio.shape[0]])
+
+                input = tf.cast(input, tf.complex64)
+                # slice = input[:2048, :]
+                print(input.shape)
+                # subset = audio[]
+                fft = tf.fft(input)
+                print(fft.shape)
+
+                output = fft
+
+
+                with tf.Session() as sess:
+                    sess.run(tf.global_variables_initializer())
+
+                    values = sess.run({
+                        "output": input
+                    }, feed_dict={input: audio})
+
+                    output_audio = values["output"]
+
+                    for i in range(output_audio.shape[0]):
+                        print(output_audio[i])
+                    # print(output_audio)
+
+                    # Helper.save_audio("fft_test", "fft_test", output_audio, sample_rate)
+
+                    # audio *= 32768
+                    # audio = audio.astype(np.int16)
+                    # path = data_input + "\\" + file_name
+                    # wav.write(path, sample_rate, audio)
+
+process_data()
 
 # process_data()
 
@@ -64,6 +95,8 @@ preview_interval = 1000
 #
 def conv(batch_input, out_channels, stride=8, activation="selu"):
     current = batch_input
+
+    # tf.fft()
 
     in_channels = current.get_shape()[2]
     filter = tf.get_variable("filter", [32, in_channels, out_channels], dtype=tf.float32,
@@ -438,15 +471,15 @@ def create_decoder(current, dropout=False):
 
 audio_scalar = 20.0
 
-def save_audio(audio, directory, filename, sample_rate):
-    audio = np.copy(audio)
-    audio *= 32768.0 / audio_scalar
-    audio = audio.astype(np.int16)
-
-    Helper.validate_directory(preview_dir)
-    wav.write(directory + "\\" + filename + ".wav", sample_rate, audio)
-
-    print(audio)
+# def save_audio(audio, directory, filename, sample_rate):
+#     audio = np.copy(audio)
+#     audio *= 32768.0 / audio_scalar
+#     audio = audio.astype(np.int16)
+#
+#     Helper.validate_directory(preview_dir)
+#     wav.write(directory + "\\" + filename + ".wav", sample_rate, audio)
+#
+#     print(audio)
 
 def train():
     raw_input = tf.placeholder(tf.float32, [process_window + (batch_size - 1) + 1, 1])
@@ -918,4 +951,4 @@ def train():
 
 
 # generate_data_shapes()
-train()
+# train()

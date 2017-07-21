@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4007e7a3-ef8f-4162-82e6-5defbfbcdd11" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_input/onclassical_demo_luisi_bach_partita_a-minor_bwv-827_1_small-version.wav" afterPath="$PROJECT_DIR$/data_input/onclassical_demo_luisi_bach_partita_a-minor_bwv-827_1_small-version.wav" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ExploreML.py" afterPath="$PROJECT_DIR$/ExploreML.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Helper.py" afterPath="$PROJECT_DIR$/Helper.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,14 +20,56 @@
       <file leaf-file-name="ExploreML.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ExploreML.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="576">
-              <caret line="30" column="0" lean-forward="true" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+            <state relative-caret-position="521">
+              <caret line="43" column="49" lean-forward="true" selection-start-line="43" selection-start-column="49" selection-end-line="43" selection-end-column="49" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#1308#1324#0" expanded="false" />
-                <element signature="e#3741#3742#0" expanded="false" />
-                <marker date="1500457832294" expanded="true" signature="3010:3078" ph="..." />
+                <element signature="e#2291#2307#0" expanded="false" />
+                <element signature="e#4740#4741#0" expanded="false" />
+                <marker date="1500602151807" expanded="true" signature="4009:4077" ph="..." />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="variables.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/tensorflow/python/ops/variables.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="351">
+              <caret line="1165" column="4" lean-forward="false" selection-start-line="1165" selection-start-column="4" selection-end-line="1165" selection-end-column="4" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pickleutil.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/ipykernel/pickleutil.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="351">
+              <caret line="266" column="30" lean-forward="true" selection-start-line="266" selection-start-column="30" selection-end-line="266" selection-end-column="30" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Helper.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Helper.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="565">
+              <caret line="16" column="12" lean-forward="false" selection-start-line="16" selection-start-column="12" selection-end-line="16" selection-end-column="12" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="gen_math_ops.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/tensorflow/python/ops/gen_math_ops.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="236">
+              <caret line="805" column="0" lean-forward="false" selection-start-line="805" selection-start-column="0" selection-end-line="805" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -44,38 +89,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="831">
               <caret line="344" column="0" lean-forward="false" selection-start-line="344" selection-start-column="0" selection-end-line="344" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pix2pix.py" pinned="false" current-in-tab="false">
-        <entry file="file://D:/Work/pix2pix old/pix2pix.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-5781">
-              <caret line="504" column="30" lean-forward="false" selection-start-line="504" selection-start-column="30" selection-end-line="504" selection-end-column="30" />
-              <folding>
-                <element signature="e#0#38#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="function_base.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/numpy/lib/function_base.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="4950" column="4" lean-forward="false" selection-start-line="4950" selection-start-column="4" selection-end-line="4950" selection-end-column="4" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="variable_scope.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/tensorflow/python/ops/variable_scope.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="622">
-              <caret line="978" column="37" lean-forward="false" selection-start-line="978" selection-start-column="37" selection-end-line="978" selection-end-column="37" />
               <folding />
             </state>
           </provider>
@@ -111,16 +124,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="nn_ops.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/tensorflow/python/ops/nn_ops.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-340">
-              <caret line="1005" column="4" lean-forward="false" selection-start-line="1005" selection-start-column="4" selection-end-line="1005" selection-end-column="4" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -132,8 +135,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>conv</find>
-      <find>global_step</find>
       <find>train_step</find>
       <find>offset</find>
       <find>audio</find>
@@ -162,6 +163,8 @@
       <find>input</find>
       <find>dropout</find>
       <find>layer</find>
+      <find>save</find>
+      <find>save_au</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -171,6 +174,7 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/Helpers.py" />
+        <option value="$PROJECT_DIR$/Helper.py" />
         <option value="$PROJECT_DIR$/ExploreML.py" />
       </list>
     </option>
@@ -350,10 +354,10 @@
     <frame x="69" y="-9" width="2500" height="1458" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.11764706" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.11764706" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17865254" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17865254" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -386,9 +390,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#1308#1324#0" expanded="false" />
-            <element signature="e#3741#3742#0" expanded="false" />
-            <marker date="1500457832294" expanded="true" signature="3010:3078" ph="..." />
+            <element signature="e#2291#2307#0" expanded="false" />
+            <element signature="e#4740#4741#0" expanded="false" />
+            <marker date="1500602151807" expanded="true" signature="4009:4077" ph="..." />
           </folding>
         </state>
       </provider>
@@ -398,7 +402,7 @@
         <state relative-caret-position="240">
           <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#19#28#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -409,9 +413,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#1308#1324#0" expanded="false" />
-            <element signature="e#3741#3742#0" expanded="false" />
-            <marker date="1500457832294" expanded="true" signature="3010:3078" ph="..." />
+            <element signature="e#2291#2307#0" expanded="false" />
+            <element signature="e#4740#4741#0" expanded="false" />
+            <marker date="1500602151807" expanded="true" signature="4009:4077" ph="..." />
           </folding>
         </state>
       </provider>
@@ -422,9 +426,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#1308#1324#0" expanded="false" />
-            <element signature="e#3741#3742#0" expanded="false" />
-            <marker date="1500457832294" expanded="true" signature="3010:3078" ph="..." />
+            <element signature="e#2291#2307#0" expanded="false" />
+            <element signature="e#4740#4741#0" expanded="false" />
+            <marker date="1500602151807" expanded="true" signature="4009:4077" ph="..." />
           </folding>
         </state>
       </provider>
@@ -435,9 +439,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#1308#1324#0" expanded="false" />
-            <element signature="e#3741#3742#0" expanded="false" />
-            <marker date="1500457832294" expanded="true" signature="3010:3078" ph="..." />
+            <element signature="e#2291#2307#0" expanded="false" />
+            <element signature="e#4740#4741#0" expanded="false" />
+            <marker date="1500602151807" expanded="true" signature="4009:4077" ph="..." />
           </folding>
         </state>
       </provider>
@@ -447,16 +451,6 @@
         <state relative-caret-position="543">
           <caret line="332" column="0" lean-forward="false" selection-start-line="332" selection-start-column="0" selection-end-line="332" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Helper.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -574,15 +568,49 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ExploreML.py">
+    <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/tensorflow/python/ops/gen_math_ops.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="30" column="0" lean-forward="true" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+        <state relative-caret-position="236">
+          <caret line="805" column="0" lean-forward="false" selection-start-line="805" selection-start-column="0" selection-end-line="805" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Helper.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="565">
+          <caret line="16" column="12" lean-forward="false" selection-start-line="16" selection-start-column="12" selection-end-line="16" selection-end-column="12" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#1308#1324#0" expanded="false" />
-            <element signature="e#3741#3742#0" expanded="false" />
-            <marker date="1500457832294" expanded="true" signature="3010:3078" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/ipykernel/pickleutil.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="351">
+          <caret line="266" column="30" lean-forward="true" selection-start-line="266" selection-start-column="30" selection-end-line="266" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/tensorflow/python/ops/variables.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="351">
+          <caret line="1165" column="4" lean-forward="false" selection-start-line="1165" selection-start-column="4" selection-end-line="1165" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ExploreML.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="521">
+          <caret line="43" column="49" lean-forward="true" selection-start-line="43" selection-start-column="49" selection-end-line="43" selection-end-column="49" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#2291#2307#0" expanded="false" />
+            <element signature="e#4740#4741#0" expanded="false" />
+            <marker date="1500602151807" expanded="true" signature="4009:4077" ph="..." />
           </folding>
         </state>
       </provider>
