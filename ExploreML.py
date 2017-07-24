@@ -18,7 +18,7 @@ max_epochs = 40000
 
 data_source = "data"
 data_contains_name = None
-data_contains_name = "piano"
+data_input = "piano"
 # data_input = "data_input"
 data_input_reference = "data_input_reference"
 
