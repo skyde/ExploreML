@@ -40,6 +40,7 @@ def encode_fft(audio, size=512, steps=512, step_offset=0):
 
     input = tf.placeholder(tf.float32, [size])
     output = tf.fft(tf.cast(input, tf.complex64))
+    output = output[:int(size / 2)]
 
     return_values = []
 
@@ -55,6 +56,9 @@ def encode_fft(audio, size=512, steps=512, step_offset=0):
             values = sess.run({"output": output}, feed_dict={input: feed_audio})
             output_values = values["output"]
 
+            # for i in range(output_values.shape[0]):
+            #     print(str(i) + " " + str(output_values[i]))
+
             output_values = np.expand_dims(output_values, axis=0)
 
             return_values.append(output_values)
@@ -63,7 +67,16 @@ def encode_fft(audio, size=512, steps=512, step_offset=0):
 
 def decode_fft(fft):
     input = tf.placeholder(tf.complex64, [fft.shape[1]])
-    output = tf.cast(tf.ifft(input), tf.float32)
+    conj = tf.conj(input)
+    print(conj.shape)
+    # inverse = tf.expand_dims(conj, axis=1)
+    inverse = tf.reverse(conj, [0])
+    # inverse = tf.squeeze(inverse)
+    full = tf.concat([input, inverse[-2: -1], inverse[:-1]], axis=-1)
+    #
+    # inverse = tf.reor/
+    output = tf.cast(tf.ifft(full), tf.float32)
+    # output = inverse
 
     return_values = []
 

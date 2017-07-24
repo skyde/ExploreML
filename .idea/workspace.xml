@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/ExploreML.py" line="141" />
+    <bookmark url="file://$PROJECT_DIR$/ExploreML.py" line="154" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4007e7a3-ef8f-4162-82e6-5defbfbcdd11" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fft_test/test.png" afterPath="$PROJECT_DIR$/fft_test/test.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fft_test/test_audio.wav" afterPath="$PROJECT_DIR$/fft_test/test_audio.wav" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ExploreML.py" afterPath="$PROJECT_DIR$/ExploreML.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Helper.py" afterPath="$PROJECT_DIR$/Helper.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -21,14 +23,34 @@
       <file leaf-file-name="ExploreML.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ExploreML.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-801">
-              <caret line="101" column="20" lean-forward="true" selection-start-line="101" selection-start-column="20" selection-end-line="101" selection-end-column="20" />
+            <state relative-caret-position="291">
+              <caret line="72" column="35" lean-forward="true" selection-start-line="72" selection-start-column="35" selection-end-line="72" selection-end-column="35" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#5807#5823#0" expanded="false" />
-                <element signature="e#8256#8257#0" expanded="false" />
-                <marker date="1500873328303" expanded="true" signature="7525:7593" ph="..." />
+                <element signature="e#6248#6264#0" expanded="false" />
+                <element signature="e#8697#8698#0" expanded="false" />
+                <marker date="1500875206719" expanded="true" signature="7966:8034" ph="..." />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="array_ops.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/tensorflow/python/ops/array_ops.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="373">
+              <caret line="2306" column="29" lean-forward="true" selection-start-line="2306" selection-start-column="29" selection-end-line="2306" selection-end-column="29" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="gen_array_ops.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/tensorflow/python/ops/gen_array_ops.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1850">
+              <caret line="2782" column="23" lean-forward="false" selection-start-line="2782" selection-start-column="23" selection-end-line="2782" selection-end-column="23" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -56,7 +78,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>transpose</find>
       <find>sqrt</find>
       <find>deconv</find>
       <find>decoder(</find>
@@ -86,6 +107,7 @@
       <find>.write</find>
       <find>Image.op</find>
       <find>start_o</find>
+      <find>reverse</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -278,7 +300,7 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15834005" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.13550341" sideWeight="0.5064464" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13550341" sideWeight="0.49355358" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16351248" sideWeight="0.49355358" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -311,9 +333,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5807#5823#0" expanded="false" />
-            <element signature="e#8256#8257#0" expanded="false" />
-            <marker date="1500873328303" expanded="true" signature="7525:7593" ph="..." />
+            <element signature="e#6248#6264#0" expanded="false" />
+            <element signature="e#8697#8698#0" expanded="false" />
+            <marker date="1500875206719" expanded="true" signature="7966:8034" ph="..." />
           </folding>
         </state>
       </provider>
@@ -334,9 +356,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5807#5823#0" expanded="false" />
-            <element signature="e#8256#8257#0" expanded="false" />
-            <marker date="1500873328303" expanded="true" signature="7525:7593" ph="..." />
+            <element signature="e#6248#6264#0" expanded="false" />
+            <element signature="e#8697#8698#0" expanded="false" />
+            <marker date="1500875206719" expanded="true" signature="7966:8034" ph="..." />
           </folding>
         </state>
       </provider>
@@ -347,9 +369,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5807#5823#0" expanded="false" />
-            <element signature="e#8256#8257#0" expanded="false" />
-            <marker date="1500873328303" expanded="true" signature="7525:7593" ph="..." />
+            <element signature="e#6248#6264#0" expanded="false" />
+            <element signature="e#8697#8698#0" expanded="false" />
+            <marker date="1500875206719" expanded="true" signature="7966:8034" ph="..." />
           </folding>
         </state>
       </provider>
@@ -360,9 +382,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5807#5823#0" expanded="false" />
-            <element signature="e#8256#8257#0" expanded="false" />
-            <marker date="1500873328303" expanded="true" signature="7525:7593" ph="..." />
+            <element signature="e#6248#6264#0" expanded="false" />
+            <element signature="e#8697#8698#0" expanded="false" />
+            <marker date="1500875206719" expanded="true" signature="7966:8034" ph="..." />
           </folding>
         </state>
       </provider>
@@ -473,14 +495,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/tensorflow/python/ops/array_ops.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="501" column="0" lean-forward="true" selection-start-line="501" selection-start-column="0" selection-end-line="501" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/tensorflow/python/ops/math_ops.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="159">
@@ -539,15 +553,31 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/tensorflow/python/ops/array_ops.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="373">
+          <caret line="2306" column="29" lean-forward="true" selection-start-line="2306" selection-start-column="29" selection-end-line="2306" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/tensorflow/python/ops/gen_array_ops.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1850">
+          <caret line="2782" column="23" lean-forward="false" selection-start-line="2782" selection-start-column="23" selection-end-line="2782" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ExploreML.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-801">
-          <caret line="101" column="20" lean-forward="true" selection-start-line="101" selection-start-column="20" selection-end-line="101" selection-end-column="20" />
+        <state relative-caret-position="291">
+          <caret line="72" column="35" lean-forward="true" selection-start-line="72" selection-start-column="35" selection-end-line="72" selection-end-column="35" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5807#5823#0" expanded="false" />
-            <element signature="e#8256#8257#0" expanded="false" />
-            <marker date="1500873328303" expanded="true" signature="7525:7593" ph="..." />
+            <element signature="e#6248#6264#0" expanded="false" />
+            <element signature="e#8697#8698#0" expanded="false" />
+            <marker date="1500875206719" expanded="true" signature="7966:8034" ph="..." />
           </folding>
         </state>
       </provider>
