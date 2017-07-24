@@ -821,6 +821,7 @@ def train():
     with tf.Session() as sess:
         with tf.name_scope("summary"):
             tf.summary.image("source", source_rgb)
+            tf.summary.image("final_generated", generated_rgb[-2:-1, :, :, :])
             tf.summary.image("generated", generated_rgb)
             tf.summary.image("truth", truth_rgb)
             tf.summary.image("predict_real", predict_real)
