@@ -32,8 +32,8 @@ layer_scale = 8
 save_interval = 500
 preview_interval = 1000
 
-encode_power = 4
-encode_scalar = 0.001
+encode_power = 5
+encode_scalar = 0.0005
 fft_size = 512
 save_frequencies = fft_size / 4
 
@@ -112,8 +112,8 @@ def save_fft_to_image(fft, path):
     image_values = image_values * encode_scalar
     image_values = np.power(np.abs(image_values), 1 / encode_power) * np.sign(image_values)
     image_values += 0.5
-    # print("max " + str(np.max(image_values)))
-    # print("min " + str(np.min(image_values)))
+    print("max " + str(np.max(image_values)))
+    print("min " + str(np.min(image_values)))
     image_values *= 255
 
     image_values = image_values.astype('uint8')
