@@ -749,11 +749,11 @@ def save_preview(sess, step, feed, source_rgb, generated_rgb, predict_real, pred
             preview_path = preview_dir + "\\" + "step_" + str(step) + "-" + str(offset)
             generated_path = preview_path + "_generated.png"
             Helper.validate_directory(preview_dir)
-            Helper.save_image(run["source"], preview_path + "_source.png")
-            Helper.save_image(run["generated"], generated_path)
-            Helper.save_image(run["truth"], preview_path + "_truth.png")
-            Helper.save_image(run["predict_real"], preview_path + "_predict_real.png")
-            Helper.save_image(run["predict_fake"], preview_path + "_predict_fake.png")
+            Helper.save_image(run["source"][0, :, :, :], preview_path + "_source.png")
+            Helper.save_image(run["generated"][-1, :, :, :], generated_path)
+            Helper.save_image(run["truth"][-1, :, :, :], preview_path + "_truth.png")
+            Helper.save_image(run["predict_real"][-1, :, :, :], preview_path + "_predict_real.png")
+            Helper.save_image(run["predict_fake"][-1, :, :, :], preview_path + "_predict_fake.png")
 
             fft = load_fft_from_image(generated_path)
             # print(fft.shape)

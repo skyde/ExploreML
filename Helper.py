@@ -46,8 +46,8 @@ def save_audio(audio, path, sample_rate):
     wav.write(path, sample_rate, audio)
 
 def save_image(image, path):
-    if len(image.shape) == 4:
-        image = image[0, :, :, :]
+    # if len(image.shape) == 4:
+    #     image = image[0, :, :, :]
     image = image * 255.0
 
     image = image.astype('uint8')
