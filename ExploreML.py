@@ -84,17 +84,6 @@ def decode_fft(fft):
 
     return np.concatenate(return_values, axis=0)
 
-def load_audio(path):
-    sample_rate, audio = wav.read(path)
-    audio = audio.astype(np.float32)
-    audio /= 32768
-    return sample_rate, audio[:, 0:1]
-
-def save_audio(audio, path, sample_rate):
-    audio *= 32768
-    audio = audio.astype(np.int16)
-    wav.write(path, sample_rate, audio)
-
 def save_fft_to_image(fft, path):
     real = np.expand_dims(fft.real, axis=-1)
     imag = np.expand_dims(fft.imag, axis=-1)
@@ -135,7 +124,7 @@ def process_data():
 
                 # Helper.validate_directory(data_input)
 
-                sample_rate, audio = load_audio(path)
+                sample_rate, audio = Helper.load_audio(path)
                 fft = encode_fft(audio, size=fft_size, steps=fft_size, step_offset=0)
                 output_path = "fft_test/test.png"
                 save_fft_to_image(fft, output_path)
@@ -144,7 +133,7 @@ def process_data():
 
                 output_wav = decode_fft(complex_values)
 
-                save_audio(output_wav, "fft_test/test_audio.wav", sample_rate)
+                Helper.save_audio(output_wav, "fft_test/test_audio.wav", sample_rate)
 
                 # print(dfft)
 

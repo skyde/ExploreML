@@ -26,3 +26,14 @@ def log10(x):
     num = tf.log(x)
     den = tf.log(tf.constant(10, dtype=num.dtype))
     return (tf.div(num, den))
+
+def load_audio(path):
+    sample_rate, audio = wav.read(path)
+    audio = audio.astype(np.float32)
+    audio /= 32768
+    return sample_rate, audio[:, 0:1]
+
+def save_audio(audio, path, sample_rate):
+    audio *= 32768
+    audio = audio.astype(np.int16)
+    wav.write(path, sample_rate, audio)
