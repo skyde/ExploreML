@@ -25,7 +25,7 @@ data_test = "data_test"
 save_dir = "save"
 preview_dir = "preview"
 train_from_scratch = False
-save_progress = False
+save_progress = True
 
 # process_window = 2**15
 # preview_length = process_window
@@ -45,6 +45,7 @@ step_size = int(source_size / 16)
 process_data_enabled = False
 train_enabled = True
 
+# try 8
 GAN_output_size = 32
 epsilon = 1e-12
 learning_rate = 0.0002
@@ -61,11 +62,12 @@ beta1 = 0.5
 #             v = tf.get_variable(var)
 #     return v
 
+encode_fft_reuse = False
 def encode_fft(audio, size=512, steps=512, step_offset=0):
 
     return_values = []
 
-    with tf.variable_scope("encode_fft"):
+    with tf.variable_scope("encode_fft", reuse=encode_fft_reuse):
         input = tf.placeholder(tf.float32, [size], "input")
         output = tf.fft(tf.cast(input, tf.complex64))
         output = output[:int(size / 2)]
@@ -94,12 +96,16 @@ def encode_fft(audio, size=512, steps=512, step_offset=0):
 
             return_values.append(output_values)
 
+    global encode_fft_reuse
+    encode_fft_reuse = True
+
     return np.concatenate(return_values, axis=0)
 
+fft_to_audio_init = False
 def fft_to_audio(fft):
 
     return_values = []
-    with tf.variable_scope("fft_to_audio"):
+    with tf.variable_scope("fft_to_audio", reuse=fft_to_audio_init):
         input = tf.placeholder(tf.complex64, [fft.shape[1]])
 
         zeroes = tf.fill([int(fft_size / 2) - int(input.shape[0])], input[-1])
@@ -121,6 +127,9 @@ def fft_to_audio(fft):
             output_values = values["output"]
 
             return_values.append(output_values)
+
+    global fft_to_audio_init
+    fft_to_audio_init = True
 
     return np.concatenate(return_values, axis=0)
 
@@ -871,7 +880,7 @@ def train():
                             _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
                 #
                 #     if step > 0 and step % preview_interval == 0:
-                #         preview_start_offset = 12 * 22400
+                #         preview_start_offset =WW 12 * 22400
                 #         preview_audio = audio[preview_start_offset: preview_start_offset + process_window, :]
                 #
                 #         filename = "preview_" + str(step)
