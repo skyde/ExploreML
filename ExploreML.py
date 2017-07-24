@@ -148,10 +148,8 @@ def load_fft_from_image(path):
 
     return complex_values
 
-def save_image_as_audio(fft, filename, directory, sample_rate):
+def save_image_as_audio(fft, path, sample_rate):
     audio = fft_to_audio(fft)
-    path = directory + "\\" + filename + ".wav"
-    Helper.validate_directory(directory)
     Helper.save_audio(audio, path, sample_rate)
 
 def process_data():
@@ -183,10 +181,10 @@ def process_data():
 
                         # Reference Audio
                         complex_values = load_fft_from_image(image_output_path)
-                        save_image_as_audio(complex_values, output_name, data_input_reference, sample_rate)
+                        Helper.validate_directory(data_input_reference)
+                        audio_output_path = data_input_reference + "\\" + output_name + ".wav"
+                        save_image_as_audio(complex_values, audio_output_path, sample_rate)
                         # output_audio = fft_to_audio(complex_values)
-                        # audio_output_path = data_input_reference + "\\" + output_name + ".wav"
-                        # Helper.validate_directory(data_input_reference)
                         # Helper.save_audio(output_audio, audio_output_path, sample_rate)
 
                         step_index += 1
@@ -712,7 +710,8 @@ def train():
                             Helper.save_image(run["truth"], preview_path + "_truth.png")
 
                             fft = load_fft_from_image(generated_path)
-                            image
+                            print(fft.shape)
+                            save_image_as_audio(fft, preview_path + "_audio.wav", 22000)
 
                         if step % 10 == 0:
                             print(run["loss"])
