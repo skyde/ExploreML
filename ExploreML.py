@@ -656,6 +656,7 @@ def train():
     # global_step = tf.contrib.framework.get_or_create_global_step()
     # train_step = tf.train.AdamOptimizer(0.001).minimize(loss, global_step=global_step)
 
+    # GAN
     real_input = tf.concat([source, truth], axis=3)
     fake_input = tf.concat([source, generated], axis=3)
 
@@ -710,13 +711,7 @@ def train():
 
     train_group = tf.group(generator_train, incr_global_step)
 
-
-
-
-
-
-
-
+    # Output
     source_rgb = output_to_rgb(source)
     generated_rgb = output_to_rgb(generated)
     truth_rgb = output_to_rgb(truth)
