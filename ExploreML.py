@@ -24,7 +24,7 @@ data_test = "data_test"
 
 save_dir = "save"
 preview_dir = "preview"
-train_from_scratch = True
+train_from_scratch = False
 save_progress = False
 
 # process_window = 2**15
