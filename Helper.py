@@ -27,11 +27,17 @@ def log10(x):
     den = tf.log(tf.constant(10, dtype=num.dtype))
     return (tf.div(num, den))
 
-def load_audio(path):
+def load_audio(path, force_mono=True):
     sample_rate, audio = wav.read(path)
     audio = audio.astype(np.float32)
     audio /= 32768
-    return sample_rate, audio[:, 0:1]
+
+    if force_mono and len(audio.shape) > 1:
+        audio = audio[:, 0:1]
+    else:
+        audio = np.expand_dims(audio, axis=1)
+
+    return sample_rate, audio
 
 def save_audio(audio, path, sample_rate):
     audio *= 32768

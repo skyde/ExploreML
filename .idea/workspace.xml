@@ -2,11 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4007e7a3-ef8f-4162-82e6-5defbfbcdd11" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_input/0-3.png" afterPath="$PROJECT_DIR$/data_input/0-3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_input/0-4.png" afterPath="$PROJECT_DIR$/data_input/0-4.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_input/0-5.png" afterPath="$PROJECT_DIR$/data_input/0-5.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_input/0-0.png" afterPath="$PROJECT_DIR$/data_input/0-0.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_input/0-1.png" afterPath="$PROJECT_DIR$/data_input/0-1.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_input_reference/0-0.wav" afterPath="$PROJECT_DIR$/data_input_reference/0-0.wav" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ExploreML.py" afterPath="$PROJECT_DIR$/ExploreML.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Helper.py" afterPath="$PROJECT_DIR$/Helper.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -21,13 +22,13 @@
       <file leaf-file-name="ExploreML.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ExploreML.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="685">
-              <caret line="105" column="18" lean-forward="false" selection-start-line="105" selection-start-column="18" selection-end-line="105" selection-end-column="18" />
+            <state relative-caret-position="720">
+              <caret line="19" column="25" lean-forward="true" selection-start-line="19" selection-start-column="25" selection-end-line="19" selection-end-column="25" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#5866#5882#0" expanded="false" />
-                <element signature="e#8315#8316#0" expanded="false" />
-                <marker date="1500884471364" expanded="true" signature="7584:7652" ph="..." />
+                <element signature="e#5894#5910#0" expanded="false" />
+                <element signature="e#8343#8344#0" expanded="false" />
+                <marker date="1500884880658" expanded="true" signature="7612:7680" ph="..." />
               </folding>
             </state>
           </provider>
@@ -106,8 +107,8 @@
       <file leaf-file-name="Helper.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Helper.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="922">
-              <caret line="39" column="0" lean-forward="false" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
+            <state relative-caret-position="442">
+              <caret line="33" column="0" lean-forward="false" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -154,8 +155,8 @@
       <find>scope</find>
       <find>reverse</find>
       <find>sc</find>
-      <find>save_fft_to_image</find>
       <find>range</find>
+      <find>save_fft_to_image</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -381,9 +382,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5866#5882#0" expanded="false" />
-            <element signature="e#8315#8316#0" expanded="false" />
-            <marker date="1500884471364" expanded="true" signature="7584:7652" ph="..." />
+            <element signature="e#5894#5910#0" expanded="false" />
+            <element signature="e#8343#8344#0" expanded="false" />
+            <marker date="1500884880658" expanded="true" signature="7612:7680" ph="..." />
           </folding>
         </state>
       </provider>
@@ -404,9 +405,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5866#5882#0" expanded="false" />
-            <element signature="e#8315#8316#0" expanded="false" />
-            <marker date="1500884471364" expanded="true" signature="7584:7652" ph="..." />
+            <element signature="e#5894#5910#0" expanded="false" />
+            <element signature="e#8343#8344#0" expanded="false" />
+            <marker date="1500884880658" expanded="true" signature="7612:7680" ph="..." />
           </folding>
         </state>
       </provider>
@@ -417,9 +418,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5866#5882#0" expanded="false" />
-            <element signature="e#8315#8316#0" expanded="false" />
-            <marker date="1500884471364" expanded="true" signature="7584:7652" ph="..." />
+            <element signature="e#5894#5910#0" expanded="false" />
+            <element signature="e#8343#8344#0" expanded="false" />
+            <marker date="1500884880658" expanded="true" signature="7612:7680" ph="..." />
           </folding>
         </state>
       </provider>
@@ -430,9 +431,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5866#5882#0" expanded="false" />
-            <element signature="e#8315#8316#0" expanded="false" />
-            <marker date="1500884471364" expanded="true" signature="7584:7652" ph="..." />
+            <element signature="e#5894#5910#0" expanded="false" />
+            <element signature="e#8343#8344#0" expanded="false" />
+            <marker date="1500884880658" expanded="true" signature="7612:7680" ph="..." />
           </folding>
         </state>
       </provider>
@@ -615,16 +616,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Helper.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="922">
-          <caret line="39" column="0" lean-forward="false" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.PyCharmCE2017.1/system/python_stubs/1626364626/builtins.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-826">
@@ -633,15 +624,25 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ExploreML.py">
+    <entry file="file://$PROJECT_DIR$/Helper.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="685">
-          <caret line="105" column="18" lean-forward="false" selection-start-line="105" selection-start-column="18" selection-end-line="105" selection-end-column="18" />
+        <state relative-caret-position="442">
+          <caret line="33" column="0" lean-forward="false" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5866#5882#0" expanded="false" />
-            <element signature="e#8315#8316#0" expanded="false" />
-            <marker date="1500884471364" expanded="true" signature="7584:7652" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ExploreML.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="720">
+          <caret line="19" column="25" lean-forward="true" selection-start-line="19" selection-start-column="25" selection-end-line="19" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#5894#5910#0" expanded="false" />
+            <element signature="e#8343#8344#0" expanded="false" />
+            <marker date="1500884880658" expanded="true" signature="7612:7680" ph="..." />
           </folding>
         </state>
       </provider>
