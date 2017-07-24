@@ -50,12 +50,10 @@ def save_image(image, path):
         image = image[0, :, :, :]
     image = image * 255.0
 
-    # print(image.shape)
-    # print(image)
-
     image = image.astype('uint8')
 
-    # print(image)
+    if image.shape[2] is 1:
+        image = np.broadcast_to(image, (image.shape[0], image.shape[1], 3))
 
     image = Image.fromarray(image)
 

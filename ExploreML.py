@@ -16,10 +16,11 @@ number_generator_filters = 32
 
 max_epochs = 4000000
 
-data_source = "data"
+data_raw = "data_raw"
 data_contains_name = "piano"
-data_input = "data_input"
-data_input_reference = "data_input_reference"
+data_train = "data_train"
+data_train_reference = "data_train_reference"
+data_test = "data_test"
 
 save_dir = "save"
 preview_dir = "preview"
@@ -164,7 +165,7 @@ def save_image_as_audio(fft, path, sample_rate):
 def process_data():
     audio_index = 0
     with tf.Session() as sess:
-        for dir_name, _, file_list in os.walk(data_source):
+        for dir_name, _, file_list in os.walk(data_raw):
             if data_contains_name is None or data_contains_name in os.path.normpath(dir_name):
                 for file_name in file_list:
                     path = dir_name + "\\" + file_name
@@ -184,14 +185,14 @@ def process_data():
 
                         # Image
                         fft = encode_fft(audio, size=fft_size, steps=fft_size, step_offset=step_offset)
-                        image_output_path = data_input + "\\" + output_name + ".png"
-                        Helper.validate_directory(data_input)
+                        image_output_path = data_train + "\\" + output_name + ".png"
+                        Helper.validate_directory(data_train)
                         save_fft_to_image(fft, image_output_path)
 
                         # Reference Audio
                         complex_values = load_fft_from_image(image_output_path)
-                        Helper.validate_directory(data_input_reference)
-                        audio_output_path = data_input_reference + "\\" + output_name + ".wav"
+                        Helper.validate_directory(data_train_reference)
+                        audio_output_path = data_train_reference + "\\" + output_name + ".wav"
                         save_image_as_audio(complex_values, audio_output_path, sample_rate)
                         # output_audio = fft_to_audio(complex_values)
                         # Helper.save_audio(output_audio, audio_output_path, sample_rate)
@@ -704,7 +705,7 @@ def create_chain(feed):
         #     preview_current = create_decoder(preview_current, preview_layers)
         #     print("preview decoder " + str(preview_current))
 
-def get_feed_paths(directory_path):
+def get_image_paths(directory_path):
     paths = []
     for dir_name, _, file_list in os.walk(directory_path):
         for file_name in file_list:
@@ -713,7 +714,9 @@ def get_feed_paths(directory_path):
 
             paths.append(path)
 
-def get_feed_image(path):
+    return paths
+
+def load_image(path):
     with open(path, 'rb') as p:
         image = Image.open(p)
         data = np.asarray(image, dtype="float32")
@@ -724,6 +727,39 @@ def get_feed_image(path):
     data = data[:, :, :2]
 
     return data
+
+def save_preview(sess, step, feed, source_rgb, generated_rgb, predict_real, predict_fake, truth_rgb, summary, writer):
+
+    for path in get_image_paths(data_test):
+        image = load_image(path)
+
+        for offset in range(0, image.shape[0] - generate_size - source_size, generate_size):
+            feed_image = image[offset: offset + source_size + generate_size]
+            feed_image = np.expand_dims(feed_image, axis=0)
+
+            run = sess.run({
+                "source": source_rgb,
+                "generated": generated_rgb,
+                "predict_real": predict_real,
+                "predict_fake": predict_fake,
+                "truth": truth_rgb,
+                "summary": summary
+            }, feed_dict={feed: feed_image})
+
+            preview_path = preview_dir + "\\" + "step_" + str(step) + "-" + str(offset)
+            generated_path = preview_path + "_generated.png"
+            Helper.validate_directory(preview_dir)
+            Helper.save_image(run["source"], preview_path + "_source.png")
+            Helper.save_image(run["generated"], generated_path)
+            Helper.save_image(run["truth"], preview_path + "_truth.png")
+            Helper.save_image(run["predict_real"], preview_path + "_predict_real.png")
+            Helper.save_image(run["predict_fake"], preview_path + "_predict_fake.png")
+
+            fft = load_fft_from_image(generated_path)
+            # print(fft.shape)
+            save_image_as_audio(fft, preview_path + "_audio.wav", 22000)
+
+    writer.add_summary(run["summary"], step)
 
 def train():
     feed = tf.placeholder(tf.float32, [source_size + generate_size, source_size, 2])
@@ -737,7 +773,6 @@ def train():
 
     print(generated.shape)
     print(generated)
-
 
     # print("Create discriminator finished")
     # print("discriminator shape %s" % str(predict_real.shape))
@@ -785,8 +820,6 @@ def train():
 
     with tf.Session() as sess:
         with tf.name_scope("summary"):
-            # tf.summary.scalar("loss", loss)
-
             tf.summary.image("source", source_rgb)
             tf.summary.image("generated", generated_rgb)
             tf.summary.image("truth", truth_rgb)
@@ -808,105 +841,75 @@ def train():
             saver.restore(sess, latest_checkpoint)
 
         while global_step.eval() < max_epochs:
-            for dir_name, _, file_list in os.walk(data_input):
-                for file_name in file_list:
-                    path = dir_name + "\\" + file_name
-                    path = path.replace('\\', '/')
+            train_paths = get_image_paths(data_train)
 
-                    with open(path, 'rb') as p:
-                        image = Image.open(p)
-                        data = np.asarray(image, dtype="float32")
-                        del image
+            for path in train_paths:
+                image = load_image(path)
 
-                    data /= 255
-                    data = data * 2 - 1.0
-                    data = data[:, :, :2]
+                for offset in range(0, image.shape[0] - generate_size - source_size, generate_size):
 
-                    # print(data.shape)
+                    feed_image = image[offset: offset + source_size + generate_size]
+                    feed_image = np.expand_dims(feed_image, axis=0)
 
-                    for offset in range(0, data.shape[0] - generate_size - source_size, generate_size):
+                    step = global_step.eval()
 
-                        feed_data = data[offset: offset + source_size + generate_size]
-                        feed_data = np.expand_dims(feed_data, axis=0)
+                    run = sess.run({
+                        "train": train_group,
+                        "global_step": global_step
+                    }, feed_dict={feed: feed_image})
 
-                        step = global_step.eval()
+                    if step % 10 == 0:
+                        print("step " + str(step))
 
-                        run = sess.run({
-                            "train": train_group,
-                            "global_step": global_step,
-                            "source": source_rgb,
-                            "generated": generated_rgb,
-                            "predict_real": predict_real,
-                            "predict_fake": predict_fake,
-                            "truth": truth_rgb,
-                            "summary": summary
-                        }, feed_dict={feed: feed_data})
+                    if step % 400 == 0:
+                        save_preview(sess, step, feed, source_rgb, generated_rgb, predict_real, predict_fake, truth_rgb, summary, writer)
 
-                        if step % 100 == 0:
-                            print("step " + str(step))
-
-                        if step % 400 == 0:
-                            preview_path = preview_dir + "\\" + "step_" + str(step)
-                            generated_path = preview_path + "_generated.png"
-                            Helper.validate_directory(preview_dir)
-                            Helper.save_image(run["source"], preview_path + "_source.png")
-                            Helper.save_image(run["generated"], generated_path)
-                            Helper.save_image(run["truth"], preview_path + "_truth.png")
-
-                            fft = load_fft_from_image(generated_path)
-                            print(fft.shape)
-                            save_image_as_audio(fft, preview_path + "_audio.wav", 22000)
-
-                        if step % 10 == 0:
-                            # print(run["loss"])
-                            writer.add_summary(run["summary"], step)
-
-                        if step % save_interval == 0:
-                            Helper.validate_directory(save_dir)
-                            if save_progress:
-                                _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
-                    #
-                    #     if step > 0 and step % preview_interval == 0:
-                    #         preview_start_offset = 12 * 22400
-                    #         preview_audio = audio[preview_start_offset: preview_start_offset + process_window, :]
-                    #
-                    #         filename = "preview_" + str(step)
-                    #         save_audio(preview_audio, preview_dir, filename + " 0 input", sample_rate)
-                    #
-                    #     #     values = sess.run({
-                    #     #         "output": preview_output
-                    #     #     }, feed_dict={preview_input: preview_audio})
-                    #     #
-                    #     #     preview_audio = values["output"][0, :, :]
-                    #     #
-                    #     #     save_audio(preview_audio, preview_dir, "preview_" + str(step) + " 1 generated", sample_rate)
-                    #
-                    #
-                    #
-                    #
-                    #
-                    #         for preview_index in range(process_window):
-                    #             if preview_index % 1000 == 0:
-                    #                 percent = float(preview_index) / float(preview_length)
-                    #                 percent = int(percent * 100)
-                    #                 print("Rendering Preview " + str(percent) + "%")
-                    #             values = sess.run({
-                    #                 "output": preview_output
-                    #             }, feed_dict={preview_input: preview_audio})
-                    #
-                    #             output_value = values["output"][0, :, :]
-                    #             preview_audio = np.append(preview_audio, output_value, axis=0)
-                    #             preview_audio = preview_audio[1:, :]
-                    #
-                    #         save_audio(preview_audio, preview_dir, "preview_" + str(step) + " 1 generated", sample_rate)
-                    #
-                    #         # preview_audio *= 32768.0 / audio_scalar
-                    #         # preview_audio = preview_audio.astype(np.int16)
-                    #         #
-                    #         # Helper.validate_directory(preview_dir)
-                    #         # wav.write(preview_dir + "\\preview_" + str(step) + ".wav", sample_rate, preview_audio)
-                    #
-                    #         print(preview_audio)
+                    if step % save_interval == 0:
+                        Helper.validate_directory(save_dir)
+                        if save_progress:
+                            _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
+                #
+                #     if step > 0 and step % preview_interval == 0:
+                #         preview_start_offset = 12 * 22400
+                #         preview_audio = audio[preview_start_offset: preview_start_offset + process_window, :]
+                #
+                #         filename = "preview_" + str(step)
+                #         save_audio(preview_audio, preview_dir, filename + " 0 input", sample_rate)
+                #
+                #     #     values = sess.run({
+                #     #         "output": preview_output
+                #     #     }, feed_dict={preview_input: preview_audio})
+                #     #
+                #     #     preview_audio = values["output"][0, :, :]
+                #     #
+                #     #     save_audio(preview_audio, preview_dir, "preview_" + str(step) + " 1 generated", sample_rate)
+                #
+                #
+                #
+                #
+                #
+                #         for preview_index in range(process_window):
+                #             if preview_index % 1000 == 0:
+                #                 percent = float(preview_index) / float(preview_length)
+                #                 percent = int(percent * 100)
+                #                 print("Rendering Preview " + str(percent) + "%")
+                #             values = sess.run({
+                #                 "output": preview_output
+                #             }, feed_dict={preview_input: preview_audio})
+                #
+                #             output_value = values["output"][0, :, :]
+                #             preview_audio = np.append(preview_audio, output_value, axis=0)
+                #             preview_audio = preview_audio[1:, :]
+                #
+                #         save_audio(preview_audio, preview_dir, "preview_" + str(step) + " 1 generated", sample_rate)
+                #
+                #         # preview_audio *= 32768.0 / audio_scalar
+                #         # preview_audio = preview_audio.astype(np.int16)
+                #         #
+                #         # Helper.validate_directory(preview_dir)
+                #         # wav.write(preview_dir + "\\preview_" + str(step) + ".wav", sample_rate, preview_audio)
+                #
+                #         print(preview_audio)
 
 
 
