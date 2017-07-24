@@ -14,7 +14,7 @@ batch_size = 256
 max_preview_export = 4
 number_generator_filters = 32
 
-max_epochs = 40000
+max_epochs = 4000000
 
 data_source = "data"
 data_contains_name = "piano"
@@ -23,7 +23,7 @@ data_input_reference = "data_input_reference"
 
 save_dir = "save"
 preview_dir = "preview"
-train_from_scratch = False
+train_from_scratch = True
 save_progress = True
 
 # process_window = 2**15
@@ -41,6 +41,13 @@ generate_size = int(source_size / 4)
 
 process_data_enabled = False
 train_enabled = True
+
+GAN_output_size = 32
+epsilon = 1e-12
+learning_rate = 0.0002
+learning_rate_L1 = 100
+learning_rate_GAN = 1
+beta1 = 0.5
 
 # def variable_scope_lazy(scope_name, var, shape=None):
 #     with tf.variable_scope(scope_name) as scope:
@@ -203,7 +210,7 @@ def process_data():
 #
 #
 
-def conv(current, out_channels):
+def conv(current, out_channels, apply_activation=True):
     # current = batch_input
 
     with tf.variable_scope("conv"):
@@ -220,7 +227,8 @@ def conv(current, out_channels):
                             dtype=tf.float32,
                             initializer=tf.random_normal_initializer(0, 0.02))
 
-        current = Helper.selu(current + w)
+        if apply_activation:
+            current = Helper.selu(current + w)
 
     return current
 
@@ -527,7 +535,7 @@ def caculate_layer_depth(size):
     # # print(index)
     # return int((16 + (index - 1) ** 2) * number_generator_filters)
 
-def create_generator(current, dropout=True):
+def create_generator(current, dropout=True, output_size=1, output_channels=None, output_activated=True):
     print("generator input " + str(current.shape))
 
     layers = []
@@ -536,11 +544,20 @@ def create_generator(current, dropout=True):
 
     layers.append(current)
 
-    while current.shape[1] > 1:
+    while current.shape[1] > output_size:
         with tf.variable_scope("conv_" + str(layer_index)):
-            depth = caculate_layer_depth(int(current.shape[1]) / 2)
+            next_size = int(current.shape[1]) / 2
+            depth = caculate_layer_depth(next_size)
 
-            current = conv(current, depth)
+            apply_activation = True
+            if next_size == output_size:
+                if not output_activated:
+                    output_activated = False
+
+                if output_channels is not None:
+                    depth = output_channels
+
+            current = conv(current, depth, apply_activation=apply_activation)
 
             print("generator layer " + str(current.shape))
 
@@ -635,9 +652,70 @@ def train():
     print("generated " + str(generated.shape))
     print("truth " + str(truth.shape))
 
-    loss = tf.reduce_mean(tf.abs(generated - truth))
+    # loss = tf.reduce_mean(tf.abs(generated - truth))
+    # global_step = tf.contrib.framework.get_or_create_global_step()
+    # train_step = tf.train.AdamOptimizer(0.001).minimize(loss, global_step=global_step)
+
+    real_input = tf.concat([source, truth], axis=3)
+    fake_input = tf.concat([source, generated], axis=3)
+
+    print("discriminator input shape " + str(real_input.shape))
+
+    with tf.variable_scope("discriminator"):
+        predict_real, _ = create_generator(real_input, output_size=GAN_output_size, dropout=True,
+                                  output_channels=1, output_activated=False)
+
+    with tf.variable_scope("discriminator", reuse=True):
+        predict_fake, _ = create_generator(fake_input, output_size=GAN_output_size, dropout=True,
+                                  output_channels=1, output_activated=False)
+
+        predict_real = tf.sigmoid(predict_real)
+        predict_fake = tf.sigmoid(predict_fake)
+
+    # print("Create discriminator finished")
+    # print("discriminator shape %s" % str(predict_real.shape))
+    # cost = tf.reduce_mean(abs(generated_latent - output_latent) * abs(generated_latent - output_latent))
+
+    # print(tf.abs(generated_output - output).shape)
+    # l1_loss = tf.reduce_mean(tf.abs(generated_output - output))
+    # print(str(l1_loss.shape))
+    # gan_loss = tf.reduce_mean(-tf.log(predict_real) + tf.log(1 - predict_fake))
+
+    with tf.name_scope("discriminator_loss"):
+        discriminator_loss = tf.reduce_mean(-(tf.log(predict_real + epsilon) + tf.log(1 - predict_fake + epsilon)))
+        discriminator_loss = discriminator_loss * learning_rate_GAN
+
+    with tf.name_scope("generator_loss"):
+        gen_loss_GAN = tf.reduce_mean(-tf.log(predict_fake + epsilon))
+        gen_loss_L1 = tf.reduce_mean(tf.abs(generated - truth))
+
+        generator_loss = gen_loss_GAN * learning_rate_GAN + gen_loss_L1 * learning_rate_L1
+
+    with tf.name_scope("discriminator_train"):
+        disc_tvars = [var for var in tf.trainable_variables() if var.name.startswith("discriminator")]
+
+        disc_optimizer = tf.train.AdamOptimizer(learning_rate, beta1)
+        disc_grads_and_vars = disc_optimizer.compute_gradients(discriminator_loss, var_list=disc_tvars)
+        discriminator_train = disc_optimizer.apply_gradients(disc_grads_and_vars)
+
+    with tf.name_scope("generator_train"):
+        with tf.control_dependencies([discriminator_train]):
+            tvars = [var for var in tf.trainable_variables() if var.name.startswith("generator")]
+            gen_optimizer = tf.train.AdamOptimizer(learning_rate, beta1)
+            gen_grads_and_vars = gen_optimizer.compute_gradients(generator_loss, var_list=tvars)
+            generator_train = gen_optimizer.apply_gradients(gen_grads_and_vars)
+
     global_step = tf.contrib.framework.get_or_create_global_step()
-    train_step = tf.train.AdamOptimizer(0.001).minimize(loss, global_step=global_step)
+    incr_global_step = tf.assign(global_step, global_step + 1)
+
+    train_group = tf.group(generator_train, incr_global_step)
+
+
+
+
+
+
+
 
     source_rgb = output_to_rgb(source)
     generated_rgb = output_to_rgb(generated)
@@ -645,14 +723,16 @@ def train():
 
     with tf.Session() as sess:
         with tf.name_scope("summary"):
-            tf.summary.scalar("loss", loss)
+            # tf.summary.scalar("loss", loss)
 
             tf.summary.image("source", source_rgb)
             tf.summary.image("generated", generated_rgb)
             tf.summary.image("truth", truth_rgb)
-        #     tf.summary.scalar("gen_loss_L1", gen_loss_L1)
-        #     tf.summary.scalar("gen_loss_GAN", gen_loss_GAN)
-        #     tf.summary.scalar("discriminator_loss", discriminator_loss)
+            tf.summary.image("predict_real", predict_real)
+            tf.summary.image("predict_fake", predict_fake)
+            tf.summary.scalar("gen_loss_L1", gen_loss_L1)
+            tf.summary.scalar("gen_loss_GAN", gen_loss_GAN)
+            tf.summary.scalar("discriminator_loss", discriminator_loss)
 
         summary = tf.summary.merge_all()
         writer = tf.summary.FileWriter(save_dir, graph=sess.graph, max_queue=10,
@@ -690,11 +770,13 @@ def train():
                         step = global_step.eval()
 
                         run = sess.run({
-                            "train_step": train_step,
+                            "train": train_group,
                             "global_step": global_step,
-                            "loss": loss,
+                            # "loss": loss,
                             "source": source_rgb,
                             "generated": generated_rgb,
+                            "predict_real": predict_real,
+                            "predict_fake": predict_fake,
                             "truth": truth_rgb,
                             "summary": summary
                         }, feed_dict={feed: feed_data})
@@ -714,7 +796,7 @@ def train():
                             save_image_as_audio(fft, preview_path + "_audio.wav", 22000)
 
                         if step % 10 == 0:
-                            print(run["loss"])
+                            # print(run["loss"])
                             writer.add_summary(run["summary"], step)
 
                         if step % save_interval == 0:
