@@ -33,6 +33,172 @@ save_interval = 500
 preview_interval = 1000
     # 2 * 22400
 
+def caculate_fft(audio, size=512, steps=512, start_offset=0):
+
+    input = tf.placeholder(tf.float32, [size])
+
+    fft = tf.fft(tf.cast(input, tf.complex64))
+
+    # x = tf.real(fft)
+    # y = tf.imag(fft)
+
+    # output = tf.sqrt(x * x + y * y)
+    # output = tf.log(output * 0.1) * 0.1
+    # output = tf.expand_dims(output, axis=-1)
+    # output = tf.maximum(0, output)
+    # tf.real
+
+    # x = tf.expand_dims(x, axis=-1)
+    # y = tf.expand_dims(y, axis=-1)
+    #
+    # output = tf.concat([x, y, y * 0], axis=-1)
+    output = fft
+
+    # scalar = tf.range(1, size + 1, 1)
+    # scalar = tf.cast(scalar, tf.float32)
+    # scalar = size / 2 - tf.abs(size / 2 - scalar)
+    # scalar *= 0.001
+    # scalar = tf.expand_dims(scalar, axis=-1)
+
+    # print("scalar " + str(scalar.shape))
+
+    # output *= 0.02
+    # output = 0.5 + output
+
+    # output *= scalar
+
+    # output = Helper.log10(output) * 0.1
+
+    # output = (0.5 + output * 2000)
+    # output = tf.cast(output, tf.int8)
+    # output = tf.log(output)
+    # output += 0.5
+
+    # print(output.shape)
+
+    # tf.shape()
+
+    # output = tf.cast(tf.ifft(fft), tf.float32)
+
+    return_values = []
+
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+
+        for i in range(steps):
+            if i % 100 == 0:
+                print("caculate_fft " + str(i) + " in " + str(steps))
+            offset = start_offset + i * size
+            feed_audio = audio[offset:offset + size, 0]
+
+            values = sess.run({
+                # "input": input,
+                "output": output
+                # "output": output
+            }, feed_dict={input: feed_audio})
+
+            # input_audio = values["input"]
+            # output_audio = values["output"]
+            output_values = values["output"]
+
+            output_values = np.expand_dims(output_values, axis=0)
+
+            return_values.append(output_values)
+
+            # print(fft_value.sha)
+            # print(fft_value[-5:])
+
+            # print("--------")
+
+            # for i in range(output_values.shape[0]):
+            # #     # print("input " + str(input_audio[i]))
+            # #     print(str(i) + " " + str(fft_values[i]))
+            #     print("output " + str(output_values[i]))
+            #     # print(output_audio)
+            #
+            #     # Helper.save_audio("fft_test", "fft_test", output_audio, sample_rate)
+            #
+            #     # audio *= 32768
+            #     # audio = audio.astype(np.int16)
+            #     # path = data_input + "\\" + file_name
+            #     # wav.write(path, sample_rate, audio)
+
+    return np.concatenate(return_values, axis=0)
+
+    # print(return_values.shape)
+
+    # return
+
+def caculate_wav(fft):
+    # print("caculate_wav input " + str(fft.shape))
+
+    input = tf.placeholder(tf.complex64, [fft.shape[1]])
+
+    # current = (input - 0.5) / 0.02
+    # input = tf.cast(input, tf.complex64)
+    # current = tf.complex(input[:, 0], input[:, 1])
+    # current =
+    current = tf.cast(tf.ifft(input), tf.float32)
+
+    print("current " + str(current.shape))
+
+    # output = current
+
+    return_values = []
+
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+
+        steps = fft.shape[0]
+        # size = fft.shape[1]
+        for i in range(steps):
+            if i % 100 == 0:
+                print("caculate_wav " + str(i) + " in " + str(steps))
+            # offset = i * size
+            feed_audio = fft[i, :]
+
+            # print("feed_audio.shape " + str(feed_audio.shape))
+
+            values = sess.run({
+                # "input": input,
+                "output": current
+                # "output": output
+            }, feed_dict={input: feed_audio})
+
+            # input_audio = values["input"]
+            # output_audio = values["output"]
+            output_values = values["output"]
+
+            # print("output_values " + str(output_values))
+
+            # output_values = np.expand_dims(output_values, axis=1)
+
+            return_values.append(output_values)
+
+            # print(fft_value.sha)
+            # print(fft_value[-5:])
+
+            # print("--------")
+
+            # for i in range(output_values.shape[0]):
+            # #     # print("input " + str(input_audio[i]))
+            # #     print(str(i) + " " + str(fft_values[i]))
+            #     print("output " + str(output_values[i]))
+            #     # print(output_audio)
+            #
+            #     # Helper.save_audio("fft_test", "fft_test", output_audio, sample_rate)
+            #
+            #     # audio *= 32768
+            #     # audio = audio.astype(np.int16)
+            #     # path = data_input + "\\" + file_name
+            #     # wav.write(path, sample_rate, audio)
+
+    return np.concatenate(return_values, axis=0)
+
+    # print(return_values.shape)
+
+    # return
+
 def process_data():
     for dir_name, _, file_list in os.walk(data_source):
         if data_contains_name is None or data_contains_name in os.path.normpath(dir_name):
@@ -45,40 +211,79 @@ def process_data():
                 audio = audio.astype(np.float64)
                 audio /= 32768
                 audio = audio[:, 0:1]
+
+                size = 512
+                dfft = caculate_fft(audio, size=size, steps=size)
+
+                dfft = 0.5 + dfft * 0.02
+                # Convert To Image
+                dfft *= 255
+                dfft = dfft.astype('uint8')
+                # image = Image.fromarray(dfft)
+                # path = "fft_test/test.png"
+                # image.save(path)
+                dfft = dfft.astype('float32')
+                dfft /= 255
+                dfft = (dfft - 0.5) / 0.02
+
+                output_wav = caculate_wav(dfft)
+
+
+                print("output wav " + str(output_wav.shape))
+                # print(output_wav)
+
+                output_wav *= 32768
+                print(output_wav)
+                output_wav = output_wav.astype(np.int16)
+                print(output_wav)
+                path = "fft_test/test_audio.wav"
+                wav.write(path, sample_rate, output_wav)
+
+                # print(dfft)
+
                 # input_size = 1024
-                audio = audio[0:512, 0]
-
-                input = tf.placeholder(tf.float32, [audio.shape[0]])
-
-                input = tf.cast(input, tf.complex64)
-                # slice = input[:2048, :]
-                print(input.shape)
-                # subset = audio[]
-                fft = tf.fft(input)
-                print(fft.shape)
-
-                output = fft
-
-
-                with tf.Session() as sess:
-                    sess.run(tf.global_variables_initializer())
-
-                    values = sess.run({
-                        "output": input
-                    }, feed_dict={input: audio})
-
-                    output_audio = values["output"]
-
-                    for i in range(output_audio.shape[0]):
-                        print(output_audio[i])
-                    # print(output_audio)
-
-                    # Helper.save_audio("fft_test", "fft_test", output_audio, sample_rate)
-
-                    # audio *= 32768
-                    # audio = audio.astype(np.int16)
-                    # path = data_input + "\\" + file_name
-                    # wav.write(path, sample_rate, audio)
+                # offset = 100000
+                # size = 128
+                # audio = audio[offset:offset + size, 0]
+                #
+                # input = tf.placeholder(tf.float32, [audio.shape[0]])
+                #
+                # fft = tf.fft(tf.cast(input, tf.complex64))
+                #
+                # output = tf.cast(tf.ifft(fft), tf.float32)
+                #
+                # # sliced_fft = tf.slice(fft, [0], [size])
+                # # abs_fft = tf.abs(sliced_fft)
+                # #
+                # # current = 20 * Helper.log10(tf.maximum(abs_fft, 1E-06))
+                # #
+                # # output = current
+                #
+                # print(output.shape)
+                #
+                # with tf.Session() as sess:
+                #     sess.run(tf.global_variables_initializer())
+                #
+                #     values = sess.run({
+                #         "input": input,
+                #         "fft": fft,
+                #         "output": output
+                #     }, feed_dict={input: audio})
+                #
+                #     input_audio = values["input"]
+                #     output_audio = values["output"]
+                #
+                #     for i in range(output_audio.shape[0]):
+                #         print("input " + str(input_audio[i]))
+                #         print("output " + str(output_audio[i]))
+                #     # print(output_audio)
+                #
+                #     # Helper.save_audio("fft_test", "fft_test", output_audio, sample_rate)
+                #
+                #     # audio *= 32768
+                #     # audio = audio.astype(np.int16)
+                #     # path = data_input + "\\" + file_name
+                #     # wav.write(path, sample_rate, audio)
 
 process_data()
 

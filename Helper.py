@@ -21,3 +21,8 @@ def save_audio(filename, directory, audio, sample_rate, scalar=32768.0, copy=Tru
 
     validate_directory(directory)
     wav.write(directory + "\\" + filename + ".wav", sample_rate, audio)
+
+def log10(x):
+    num = tf.log(x)
+    den = tf.log(tf.constant(10, dtype=num.dtype))
+    return (tf.div(num, den))
