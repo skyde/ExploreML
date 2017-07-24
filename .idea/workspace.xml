@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="4007e7a3-ef8f-4162-82e6-5defbfbcdd11" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ExploreML.py" afterPath="$PROJECT_DIR$/ExploreML.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Helper.py" afterPath="$PROJECT_DIR$/Helper.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,11 +17,11 @@
       <file leaf-file-name="ExploreML.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ExploreML.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="288">
-              <caret line="670" column="48" lean-forward="false" selection-start-line="670" selection-start-column="48" selection-end-line="670" selection-end-column="48" />
+            <state relative-caret-position="-4253">
+              <caret line="185" column="49" lean-forward="false" selection-start-line="185" selection-start-column="49" selection-end-line="185" selection-end-column="49" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#5940#5956#0" expanded="false" />
+                <element signature="e#6295#6311#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -131,7 +130,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>step_offset</find>
       <find>scope</find>
       <find>sc</find>
       <find>save_fft_to_image</find>
@@ -161,6 +159,7 @@
       <find>rgb</find>
       <find>_rgb</find>
       <find>preview</find>
+      <find>decode_fft</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -350,10 +349,10 @@
     <frame x="53" y="-9" width="1876" height="1098" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2131324" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2131324" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.13550341" sideWeight="0.5064464" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24765868" sideWeight="0.49355358" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24765868" sideWeight="0.49355358" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -519,7 +518,7 @@
           <caret line="186" column="0" lean-forward="true" selection-start-line="186" selection-start-column="0" selection-end-line="186" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5940#5956#0" expanded="false" />
+            <element signature="e#6295#6311#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -530,7 +529,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5940#5956#0" expanded="false" />
+            <element signature="e#6295#6311#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -551,7 +550,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5940#5956#0" expanded="false" />
+            <element signature="e#6295#6311#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -562,7 +561,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5940#5956#0" expanded="false" />
+            <element signature="e#6295#6311#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -573,7 +572,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5940#5956#0" expanded="false" />
+            <element signature="e#6295#6311#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -806,11 +805,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ExploreML.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="670" column="48" lean-forward="false" selection-start-line="670" selection-start-column="48" selection-end-line="670" selection-end-column="48" />
+        <state relative-caret-position="-4253">
+          <caret line="185" column="49" lean-forward="false" selection-start-line="185" selection-start-column="49" selection-end-line="185" selection-end-column="49" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#5940#5956#0" expanded="false" />
+            <element signature="e#6295#6311#0" expanded="false" />
           </folding>
         </state>
       </provider>

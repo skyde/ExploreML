@@ -23,7 +23,7 @@ data_input_reference = "data_input_reference"
 
 save_dir = "save"
 preview_dir = "preview"
-train_from_scratch = True
+train_from_scratch = False
 save_progress = True
 
 # process_window = 2**15
@@ -86,10 +86,10 @@ def encode_fft(audio, size=512, steps=512, step_offset=0):
 
     return np.concatenate(return_values, axis=0)
 
-def decode_fft(fft):
+def fft_to_audio(fft):
 
     return_values = []
-    with tf.variable_scope("decode_fft"):
+    with tf.variable_scope("fft_to_audio"):
         input = tf.placeholder(tf.complex64, [fft.shape[1]])
 
         zeroes = tf.fill([int(fft_size / 2) - int(input.shape[0])], input[-1])
@@ -148,6 +148,12 @@ def load_fft_from_image(path):
 
     return complex_values
 
+def save_image_as_audio(fft, filename, directory, sample_rate):
+    audio = fft_to_audio(fft)
+    path = directory + "\\" + filename + ".wav"
+    Helper.validate_directory(directory)
+    Helper.save_audio(audio, path, sample_rate)
+
 def process_data():
     audio_index = 0
     with tf.Session() as sess:
@@ -177,10 +183,11 @@ def process_data():
 
                         # Reference Audio
                         complex_values = load_fft_from_image(image_output_path)
-                        output_audio = decode_fft(complex_values)
-                        audio_output_path = data_input_reference + "\\" + output_name + ".wav"
-                        Helper.validate_directory(data_input_reference)
-                        Helper.save_audio(output_audio, audio_output_path, sample_rate)
+                        save_image_as_audio(complex_values, output_name, data_input_reference, sample_rate)
+                        # output_audio = fft_to_audio(complex_values)
+                        # audio_output_path = data_input_reference + "\\" + output_name + ".wav"
+                        # Helper.validate_directory(data_input_reference)
+                        # Helper.save_audio(output_audio, audio_output_path, sample_rate)
 
                         step_index += 1
 
@@ -668,7 +675,7 @@ def train():
 
                     with open(path, 'rb') as p:
                         image = Image.open(p)
-                        data = np.asarray(im    age, dtype="float32")
+                        data = np.asarray(image, dtype="float32")
                         del image
 
                     data /= 255
@@ -699,9 +706,13 @@ def train():
 
                         if step % 400 == 0:
                             preview_path = preview_dir + "\\" + "step_" + str(step)
+                            generated_path = preview_path + "_generated.png"
                             Helper.save_image(run["source"], preview_path + "_source.png")
-                            Helper.save_image(run["generated"], preview_path + "_generated.png")
+                            Helper.save_image(run["generated"], generated_path)
                             Helper.save_image(run["truth"], preview_path + "_truth.png")
+
+                            fft = load_fft_from_image(generated_path)
+                            image
 
                         if step % 10 == 0:
                             print(run["loss"])
