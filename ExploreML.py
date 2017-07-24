@@ -11,7 +11,7 @@ import math
 # input_size = 128
 # output_size = 128
 batch_size = 256
-max_preview_export = 4
+max_preview_export = 16
 number_generator_filters = 32
 
 max_epochs = 4000000
@@ -24,7 +24,7 @@ data_test = "data_test"
 
 save_dir = "save"
 preview_dir = "preview"
-train_from_scratch = False
+train_from_scratch = True
 save_progress = True
 
 # process_window = 2**15
@@ -40,7 +40,7 @@ fft_size = 512
 source_size = int(fft_size / 4)
 generate_size = source_size
 
-step_size = int(source_size / 16)
+step_size = int(source_size)
 
 process_data_enabled = False
 train_enabled = True
@@ -646,23 +646,24 @@ def create_chain(feed):
     list_predict_fake = []
 
     current = feed[:, :source_size, :, :]
-    # source = current
+    source = current
 
     reuse = False
     for offset in range(0, feed.shape[1] - source_size, step_size):
-        truth = feed[:, offset: offset + generate_size, :, :]
+        truth = feed[:, step_size + offset: step_size + offset + generate_size, :, :]
 
-        if offset != 0:
-            left = source[:, step_size:, :, :]
-            right = current[:, -step_size:, :, :]
-            print("left.shape " + str(left.shape))
-            print("right.shape " + str(right.shape))
-            current = tf.concat([left, right], 1)
+        # if offset != 0:
+        #     left = source[:, step_size:, :, :]
+        #     right = current[:, -step_size:, :, :]
+        #     print("left.shape " + str(left.shape))
+        #     print("right.shape " + str(right.shape))
+        #     current = tf.concat([left, right], 1)
 
-        source = current
+        # source = current
 
         with tf.variable_scope("generator", reuse=reuse):
-            current, layers = create_generator(current)
+            generator_input = tf.concat([current, source], axis=3)
+            current, layers = create_generator(generator_input)
             print("generator " + str(current))
             current = create_decoder(current, layers)
             print("decoder " + str(current))
