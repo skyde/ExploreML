@@ -12,14 +12,13 @@ import math
 # output_size = 128
 batch_size = 256
 max_preview_export = 4
-number_generator_filters = 4
+number_generator_filters = 1
 
 max_epochs = 40000
 
 data_source = "data"
-data_contains_name = None
-data_input = "piano"
-# data_input = "data_input"
+data_contains_name = "piano"
+data_input = "data_input"
 data_input_reference = "data_input_reference"
 
 save_dir = "save"
@@ -27,9 +26,9 @@ preview_dir = "preview"
 train_from_scratch = True
 save_progress = True
 
-process_window = 2**15
-preview_length = process_window
-layer_scale = 8
+# process_window = 2**15
+# preview_length = process_window
+# layer_scale = 8
 
 save_interval = 500
 preview_interval = 1000
@@ -37,7 +36,11 @@ preview_interval = 1000
 encode_power = 5
 encode_scalar = 0.0005
 fft_size = 512
-save_frequencies = fft_size / 4
+source_size = int(fft_size / 4)
+generate_size = int(source_size / 4)
+
+process_data_enabled = False
+train_enabled = True
 
 # def variable_scope_lazy(scope_name, var, shape=None):
 #     with tf.variable_scope(scope_name) as scope:
@@ -57,7 +60,7 @@ def encode_fft(audio, size=512, steps=512, step_offset=0):
         output = tf.fft(tf.cast(input, tf.complex64))
         output = output[:int(size / 2)]
 
-        output = output[:int(save_frequencies)]
+        output = output[:int(source_size)]
 
         sess = tf.get_default_session()
         # tf.global_variables_initializer()
@@ -185,8 +188,6 @@ def process_data():
 
 # process_data()
 
-# process_data()
-
 #
 #
 # def lrelu(x, leak=0.2, name="lrelu"):
@@ -196,58 +197,54 @@ def process_data():
 #         return f1 * x + f2 * abs(x)
 #
 #
-def conv(batch_input, out_channels, stride=8, activation="selu"):
-    current = batch_input
 
-    # tf.fft()
+def conv(current, out_channels):
+    # current = batch_input
 
-    in_channels = current.get_shape()[2]
-    filter = tf.get_variable("filter", [32, in_channels, out_channels], dtype=tf.float32,
-                             initializer=tf.random_normal_initializer(0, 0.02))
-    # [batch, in_size, in_channels], [filter_size, in_channels, out_channels]
-    #     => [batch, out_size, out_channels]
-    current = tf.nn.conv1d(current, filter, stride, padding="SAME")
-    # values = []
-    # for i in range(in_channels / 2):
-    #     with tf.variable_scope("filter_" + i):
-    #         filter = tf.get_variable("filter", [1, current.shape[1], out_channels], dtype=tf.float32,
-    #                                 initializer=tf.random_normal_initializer(0, 0.02))
-    #     values.append()
+    with tf.variable_scope("conv"):
+        in_channels = current.get_shape()[3]
+        filter = tf.get_variable("filter",
+                                 [4, 4, in_channels, out_channels],
+                                 dtype=tf.float32,
+                                 initializer=tf.random_normal_initializer(0, 0.02))
 
-    b = tf.get_variable("encoder_bias", [1, current.shape[1], out_channels], dtype=tf.float32,
-                        initializer=tf.random_normal_initializer(0, 0.02))
+        current = tf.nn.conv2d(current, filter, [1, 2, 2, 1], padding="SAME")
 
-    if activation == "selu":
-        current = Helper.selu(current + b)
+        w = tf.get_variable("encoder_bias",
+                            [1, 1, 1, out_channels],
+                            dtype=tf.float32,
+                            initializer=tf.random_normal_initializer(0, 0.02))
+
+        current = Helper.selu(current + w)
 
     return current
 
-def deconv(batch_input, out_channels, activation="selu"):
-    current = batch_input
+def deconv(current, out_channels):
+    out_channels = int(out_channels)
 
-    in_channels = current.get_shape()[-1]
-    filter = tf.get_variable("filter", [4, 1, out_channels, in_channels], dtype=tf.float32,
-                             initializer=tf.random_normal_initializer(0, 0.02))
+    with tf.variable_scope("deconv"):
+        shape = current.get_shape()
+        in_channels = shape[3]
+        filter = tf.get_variable("filter",
+                                 [4, 4, out_channels, in_channels],
+                                 dtype=tf.float32,
+                                 initializer=tf.random_normal_initializer(0, 0.02))
 
-    output_shape = tf.stack([current.get_shape()[0],
-                             current.shape[1] * layer_scale,
-                             1,
-                             out_channels])
+        dyn_input_shape = tf.shape(current)[0]
+        local_batch = dyn_input_shape
+        output_shape = tf.stack([local_batch,
+                                 current.shape[1] * 2,
+                                 current.shape[2] * 2,
+                                 out_channels])
 
-    # print("current.shape " + str(current.shape))
-    current = tf.expand_dims(current, axis=2)
-    # print("current.shape " + str(current.shape))
+        current = tf.nn.conv2d_transpose(current, filter, output_shape, [1, 2, 2, 1], padding="SAME")
+        current = tf.reshape(current, output_shape)
 
-    current = tf.nn.conv2d_transpose(current, filter, output_shape, [1, 2, 1, 1], padding="SAME")
+        w = tf.get_variable("decoder_bias",
+                            [1, 1, 1, out_channels],
+                            dtype=tf.float32,
+                            initializer=tf.random_normal_initializer(0, 0.02))
 
-    # print("current.shape " + str(current.shape))
-    current = tf.squeeze(current, [2])
-    # print("current.shape " + str(current.shape))
-
-    w = tf.get_variable("encoder_bias", [1, current.shape[1], out_channels], dtype=tf.float32,
-                        initializer=tf.random_normal_initializer(0, 0.02))
-
-    if activation == "selu":
         current = Helper.selu(current + w)
 
     return current
@@ -528,129 +525,149 @@ def deconv(batch_input, out_channels, activation="selu"):
 #         image_path = path.replace("%", str(v))
 #         saveImage(images[v, :, :, :], image_path, rescale_space=rescale_space)
 #
-#
+
 def caculate_layer_depth(size):
-    # math.factorial()
+    if size == source_size / 2:
+        return 2 * number_generator_filters
+    elif size == source_size / 4:
+        return 4 * number_generator_filters
+    # elif size == 2:
+    #     return 12 * number_generator_filters
+    # elif size == 1:
+    #     return 16 * number_generator_filters
 
-    index = math.log(process_window, 2) - math.log(size, 2)
-    # print(index)
-    return int((16 + (index - 1) ** 2) * number_generator_filters)
+    return 8 * number_generator_filters
+    # index = math.log(process_window, 2) - math.log(size, 2)
+    # # print(index)
+    # return int((16 + (index - 1) ** 2) * number_generator_filters)
 
-def create_generator(current, dropout=True, output_depth=None):
-    print(current.shape)
+def create_generator(current, dropout=True):
+    print("generator input " + str(current.shape))
 
-    i = 0
+    layers = []
+
+    layer_index = 0
+
+    layers.append(current)
+
     while current.shape[1] > 1:
-        with tf.variable_scope("conv_" + str(i)):
-            depth = caculate_layer_depth(int(current.shape[1]) / layer_scale)
-            # depth = min(8 * number_generator_filters, 4 + i * number_generator_filters / 2)
-            if output_depth is not None and current.shape[1] == layer_scale:
-                depth = output_depth
+        with tf.variable_scope("conv_" + str(layer_index)):
+            depth = caculate_layer_depth(int(current.shape[1]) / 2)
+
             current = conv(current, depth)
-            if dropout:
+
+            print("generator layer " + str(current.shape))
+
+            if dropout and current.shape[1] <= 32:
                 current = tf.nn.dropout(current, 0.4)
-            print(current.shape)
-        i += 1
 
-    return current
+            layers.append(current)
 
-def create_decoder(current, dropout=False):
-    print(current.shape)
+            layer_index += 1
 
-    i = 0
-    while current.shape[1] < process_window:
-        with tf.variable_scope("deconv_" + str(i)):
-            depth = caculate_layer_depth(int(current.shape[1]) * layer_scale)
-            if current.shape[1] * layer_scale == process_window:
-                depth = 1
+    return current, layers
+
+def create_decoder(current, layers, dropout=False, output_channels=2):
+    print("decoder input " + str(current.shape))
+
+    layer_index = 0
+    while current.shape[1] < source_size:
+        with tf.variable_scope("deconv_" + str(layer_index)):
+            depth = caculate_layer_depth(int(current.shape[1]) * 2)
+
+            if current.shape[1] * 2 == source_size:
+                depth = output_channels
+
+            for layer in layers:
+                if layer.shape[1] == current.shape[1]:
+                    current = tf.concat([current, layer], axis=3)
+                    print("skip " + str(current.shape))
+
+            # skip_matches = filter(lambda x: x.shape[1] == current.shape[1], layers)
+            #
+            # # for [x ff]
+            # print(len(skip_matches))
+            # if skip_matches
+
             current = deconv(current, depth)
-            if dropout:
+
+            print("decoder layer " + str(current.shape))
+
+            if dropout and current.shape[1] <= 32:
                 current = tf.nn.dropout(current, 0.4)
-            print(current.shape)
-        i += 1
+
+            layer_index += 1
 
     return current
-# def save_preview(sess, audio):
 
-audio_scalar = 20.0
+# def load_images(path, size_y, size_x, channels=3):
+#     file_names = tf.train.match_filenames_once(os.path.join(path, "*.*"))
+#     print(file_names)
+#
+#     filename_queue = tf.train.string_input_producer(file_names, shuffle=False, seed=42)
+#
+#     image_reader = tf.WholeFileReader()
+#     _, image_file = image_reader.read(filename_queue)
+#     images = tf.image.decode_png(image_file)
+#     images.set_shape((size_y, size_x, 3))
+#     images = tf.cast(images, tf.float32)
+#     images = (images / 255.0)
+#
+#     return images
 
-# def save_audio(audio, directory, filename, sample_rate):
-#     audio = np.copy(audio)
-#     audio *= 32768.0 / audio_scalar
-#     audio = audio.astype(np.int16)
-#
-#     Helper.validate_directory(preview_dir)
-#     wav.write(directory + "\\" + filename + ".wav", sample_rate, audio)
-#
-#     print(audio)
+def output_to_rgb(image):
+    image = image * 0.5 + 0.5
+    return tf.concat([image, tf.zeros(image.shape, tf.float32)], axis=-1)
 
 def train():
-    raw_input = tf.placeholder(tf.float32, [process_window + (batch_size - 1) + 1, 1])
+    feed = tf.placeholder(tf.float32, [source_size + generate_size, source_size, 2])
+    feed = tf.expand_dims(feed, axis=0)
+    # feed = tf.expand_dims(feed, axis=-1)
 
-    inputs = []
-    targets = []
+    source = feed[:, :source_size, :, :]
+    truth = feed[:, generate_size:, :, :]
 
-    for i in range(batch_size):
-        input_local = raw_input[i: i + process_window, :]
-        target_local = raw_input[i + process_window: i + process_window + 1, :]
-
-        input_local = tf.expand_dims(input_local, axis=0)
-        target_local = tf.expand_dims(target_local, axis=0)
-
-        inputs.append(input_local)
-        targets.append(target_local)
-
-    input = tf.concat(inputs, axis=0)
-    target = tf.concat(targets, axis=0)
-
-    # target = input
-
-    print("input " + str(input))
-    print("target " + str(target))
-#
-#     # input = tf.placeholder(tf.float32, [None, input_size, input_size, 3])
-#     # output = tf.placeholder(tf.float32, [None, output_size, output_size, 3])
-#
     with tf.variable_scope("generator"):
-        current = create_generator(input, output_depth=1)
+        current, layers = create_generator(source)
         print("generator " + str(current))
-        # current = create_decoder(current)
-        # print("decoder " + str(current))
+        current = create_decoder(current, layers)
+        print("decoder " + str(current))
 
     with tf.variable_scope("generator", reuse=True):
-        preview_input = tf.placeholder(tf.float32, [process_window, 1])
-        expanded_input = tf.expand_dims(preview_input, axis=0)
-        preview_output = create_generator(expanded_input, dropout=False, output_depth=1)
-        # preview_output = create_decoder(preview_output)
+        preview_current, preview_layers = create_generator(source)
+        print("preview generator " + str(preview_current))
+        preview_current = create_decoder(preview_current, preview_layers)
+        print("preview decoder " + str(preview_current))
 
-    generated_output = current
+    current = tf.reshape(current, [ int(source.shape[0]),
+                                    int(current.shape[1]),
+                                    int(current.shape[2]),
+                                    int(current.shape[3])])
+    generated = current
 
-    print("generated_output shape " + str(generated_output.shape))
-    print("target shape " + str(target.shape))
+    print("generated " + str(generated.shape))
+    print("truth " + str(truth.shape))
 
-    loss = tf.reduce_mean(tf.abs(generated_output - target))
+    loss = tf.reduce_mean(tf.abs(generated - truth))
     global_step = tf.contrib.framework.get_or_create_global_step()
     train_step = tf.train.AdamOptimizer(0.001).minimize(loss, global_step=global_step)
 
     with tf.Session() as sess:
-
-        # Summary
         with tf.name_scope("summary"):
             tf.summary.scalar("loss", loss)
-        #     tf.summary.image("generated_output", generated_output)
-        #     tf.summary.image("output", output)
+
+            tf.summary.image("source", output_to_rgb(source))
+            tf.summary.image("generated", output_to_rgb(generated))
+            tf.summary.image("truth", output_to_rgb(truth))
         #     tf.summary.scalar("gen_loss_L1", gen_loss_L1)
         #     tf.summary.scalar("gen_loss_GAN", gen_loss_GAN)
         #     tf.summary.scalar("discriminator_loss", discriminator_loss)
 
-        summary_merged = tf.summary.merge_all()
-
+        summary = tf.summary.merge_all()
         writer = tf.summary.FileWriter(save_dir, graph=sess.graph)
-
         sess.run(tf.global_variables_initializer())
 
         saver = tf.train.Saver(max_to_keep=4, keep_checkpoint_every_n_hours=1)
-
         latest_checkpoint = tf.train.latest_checkpoint(save_dir)
         if latest_checkpoint is not None and not train_from_scratch:
             print("Loading checkpoint " + latest_checkpoint)
@@ -662,108 +679,113 @@ def train():
                     path = dir_name + "\\" + file_name
                     path = path.replace('\\', '/')
 
-                    sample_rate, audio = wav.read(path)
-                    audio = audio[:, 0]
-                    audio = audio.astype(np.float32)
-                    audio /= 32768.0
-                    # audio = audio * 2.0 - 1.0
-                    audio *= audio_scalar
-                    # print("max " + str(np.max(audio)))
-                    # print("min " + str(np.min(audio)))
+                    with open(path, 'rb') as p:
+                        image = Image.open(p)
+                        data = np.asarray(image, dtype="float32")
+                        del image
 
-                    # Left Channel
-                    # print("audio.shape " + str(audio.shape))
-                    # print("audio.shape " + str(audio.shape))
-                    # audio = np.expand_dims(audio, axis=0)
-                    audio = np.expand_dims(audio, axis=1)
+                    data /= 255
+                    data = data * 2 - 1.0
+                    data = data[:, :, :2]
 
-                    # offset = 0
+                    # print(data.shape)
 
-                    # print(audio.shape)
-                    # print(audio)
+                    for offset in range(0, data.shape[0] - generate_size - source_size, generate_size):
+                        # print(offset)
 
-                    # print("shape " + str(offset < audio.shape[1] - process_window - batch_size))
-
-                    # i = 0
-                    for offset in range(0, audio.shape[0] - process_window - batch_size - 1, batch_size):
+                        feed_data = data[offset: offset + source_size + generate_size]
+                        feed_data = np.expand_dims(feed_data, axis=0)
 
                         step = global_step.eval()
-                        print("step " + str(step))
-
-                        input_audio = np.copy(audio)
-                        input_audio = input_audio[offset:offset + process_window + batch_size, :]
-                        # print("offset " + str(offset))
-                        # print(input_audio.shape)
-
-                        # train_step.run(feed_dict={raw_input: input_audio})
-                        values = sess.run({
+                    #
+                    #     input_audio = np.copy(audio)
+                    #     input_audio = input_audio[offset:offset + process_window + batch_size, :]
+                    #     # print("offset " + str(offset))
+                    #     # print(input_audio.shape)
+                    #
+                    #     # train_step.run(feed_dict={raw_input: input_audio})
+                        run = sess.run({
                             "train_step": train_step,
                             "global_step": global_step,
                             "loss": loss,
-                            "input": input,
-                            "target": target,
-                            "generated_output": generated_output,
-                            "summary": summary_merged
-                        }, feed_dict={raw_input: input_audio})
+                            "source": source,
+                            "truth": truth,
+                            "generated": generated,
+                            "summary": summary
+                        }, feed_dict={feed: feed_data})
 
-                        # every_step_start_offset = 12 * 22400
-                        # every_step_audio = audio[every_step_start_offset: every_step_start_offset + process_window, :]
-                        #
-                        # save_audio(every_step_audio, preview_dir, "every_step_" + str(step), sample_rate)
+                        if step % 100 == 0:
+                            print("step " + str(step))
 
                         if step % 10 == 0:
-                            writer.add_summary(values["summary"], step)
+                            print(run["loss"])
+                            writer.add_summary(run["summary"], step)
 
-                            print("loss " + str(values["loss"]))
-                            print("target " + str(values["target"][0, 0, 0]))
-                            print("generated_output " + str(values["generated_output"][0, 0, 0]))
+                        # print("target " + str(run["target"][0, 0, 0]))
+                        #     print("generated_output " + str(run["generated"][0, 0, 0]))
+                    #
+                    #     if step % save_interval == 0:
+                    #         Helper.validate_directory(save_dir)
+                    #         if save_progress:
+                    #             _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
+                    #
+                    #     if step > 0 and step % preview_interval == 0:
+                    #         preview_start_offset = 12 * 22400
+                    #         preview_audio = audio[preview_start_offset: preview_start_offset + process_window, :]
+                    #
+                    #         filename = "preview_" + str(step)
+                    #         save_audio(preview_audio, preview_dir, filename + " 0 input", sample_rate)
+                    #
+                    #     #     values = sess.run({
+                    #     #         "output": preview_output
+                    #     #     }, feed_dict={preview_input: preview_audio})
+                    #     #
+                    #     #     preview_audio = values["output"][0, :, :]
+                    #     #
+                    #     #     save_audio(preview_audio, preview_dir, "preview_" + str(step) + " 1 generated", sample_rate)
+                    #
+                    #
+                    #
+                    #
+                    #
+                    #         for preview_index in range(process_window):
+                    #             if preview_index % 1000 == 0:
+                    #                 percent = float(preview_index) / float(preview_length)
+                    #                 percent = int(percent * 100)
+                    #                 print("Rendering Preview " + str(percent) + "%")
+                    #             values = sess.run({
+                    #                 "output": preview_output
+                    #             }, feed_dict={preview_input: preview_audio})
+                    #
+                    #             output_value = values["output"][0, :, :]
+                    #             preview_audio = np.append(preview_audio, output_value, axis=0)
+                    #             preview_audio = preview_audio[1:, :]
+                    #
+                    #         save_audio(preview_audio, preview_dir, "preview_" + str(step) + " 1 generated", sample_rate)
+                    #
+                    #         # preview_audio *= 32768.0 / audio_scalar
+                    #         # preview_audio = preview_audio.astype(np.int16)
+                    #         #
+                    #         # Helper.validate_directory(preview_dir)
+                    #         # wav.write(preview_dir + "\\preview_" + str(step) + ".wav", sample_rate, preview_audio)
+                    #
+                    #         print(preview_audio)
 
-                        if step % save_interval == 0:
-                            Helper.validate_directory(save_dir)
-                            if save_progress:
-                                _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
-
-                        if step > 0 and step % preview_interval == 0:
-                            preview_start_offset = 12 * 22400
-                            preview_audio = audio[preview_start_offset: preview_start_offset + process_window, :]
-
-                            filename = "preview_" + str(step)
-                            save_audio(preview_audio, preview_dir, filename + " 0 input", sample_rate)
-
-                        #     values = sess.run({
-                        #         "output": preview_output
-                        #     }, feed_dict={preview_input: preview_audio})
-                        #
-                        #     preview_audio = values["output"][0, :, :]
-                        #
-                        #     save_audio(preview_audio, preview_dir, "preview_" + str(step) + " 1 generated", sample_rate)
 
 
 
 
 
-                            for preview_index in range(process_window):
-                                if preview_index % 1000 == 0:
-                                    percent = float(preview_index) / float(preview_length)
-                                    percent = int(percent * 100)
-                                    print("Rendering Preview " + str(percent) + "%")
-                                values = sess.run({
-                                    "output": preview_output
-                                }, feed_dict={preview_input: preview_audio})
 
-                                output_value = values["output"][0, :, :]
-                                preview_audio = np.append(preview_audio, output_value, axis=0)
-                                preview_audio = preview_audio[1:, :]
 
-                            save_audio(preview_audio, preview_dir, "preview_" + str(step) + " 1 generated", sample_rate)
 
-                            # preview_audio *= 32768.0 / audio_scalar
-                            # preview_audio = preview_audio.astype(np.int16)
-                            #
-                            # Helper.validate_directory(preview_dir)
-                            # wav.write(preview_dir + "\\preview_" + str(step) + ".wav", sample_rate, preview_audio)
 
-                            print(preview_audio)
+
+
+
+
+
+
 
 
 
@@ -1054,4 +1076,9 @@ def train():
 
 
 # generate_data_shapes()
-# train()
+
+if process_data_enabled:
+    process_data()
+
+if train_enabled:
+    train()
