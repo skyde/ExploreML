@@ -240,7 +240,10 @@ def process_data():
                 image = Image.fromarray(image_values)
                 path = "fft_test/test.png"
                 image.save(path)
-                image_values = image_values.astype('float32')
+                image = None
+                image = Image.open(path)
+                image_values = np.asarray(image, dtype="float32")
+                # image_values = image_values.astype('float32')
 
                 image_values /= 255
                 image_values -= 0.5
