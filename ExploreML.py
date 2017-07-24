@@ -12,7 +12,7 @@ import math
 # output_size = 128
 batch_size = 256
 max_preview_export = 4
-number_generator_filters = 1
+number_generator_filters = 32
 
 max_epochs = 40000
 
@@ -668,7 +668,7 @@ def train():
 
                     with open(path, 'rb') as p:
                         image = Image.open(p)
-                        data = np.asarray(image, dtype="float32")
+                        data = np.asarray(im    age, dtype="float32")
                         del image
 
                     data /= 255
@@ -698,7 +698,7 @@ def train():
                             print("step " + str(step))
 
                         if step % 400 == 0:
-                            preview_path = preview_dir + "\\" + "step_"
+                            preview_path = preview_dir + "\\" + "step_" + str(step)
                             Helper.save_image(run["source"], preview_path + "_source.png")
                             Helper.save_image(run["generated"], preview_path + "_generated.png")
                             Helper.save_image(run["truth"], preview_path + "_truth.png")

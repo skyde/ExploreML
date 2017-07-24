@@ -50,12 +50,12 @@ def save_image(image, path):
         image = image[0, :, :, :]
     image = image * 255.0
 
-    print(image.shape)
-    print(image)
+    # print(image.shape)
+    # print(image)
 
     image = image.astype('uint8')
 
-    print(image)
+    # print(image)
 
     image = Image.fromarray(image)
 
