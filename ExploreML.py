@@ -38,27 +38,37 @@ encode_scalar = 0.0005
 fft_size = 512
 save_frequencies = fft_size / 4
 
+# def variable_scope_lazy(scope_name, var, shape=None):
+#     with tf.variable_scope(scope_name) as scope:
+#         try:
+#             v = tf.get_variable(var, shape)
+#         except ValueError:
+#             scope.reuse_variables()
+#             v = tf.get_variable(var)
+#     return v
+
 def encode_fft(audio, size=512, steps=512, step_offset=0):
-
-    input = tf.placeholder(tf.float32, [size])
-    output = tf.fft(tf.cast(input, tf.complex64))
-    output = output[:int(size / 2)]
-
-    output = output[:int(save_frequencies)]
 
     return_values = []
 
-    with tf.Session() as sess:
-        sess.run(tf.global_variables_initializer())
+    with tf.variable_scope("encode_fft"):
+        input = tf.placeholder(tf.float32, [size], "input")
+        output = tf.fft(tf.cast(input, tf.complex64))
+        output = output[:int(size / 2)]
+
+        output = output[:int(save_frequencies)]
+
+        sess = tf.get_default_session()
+        # tf.global_variables_initializer()
 
         for i in range(steps):
             # if i % 100 == 0:
             #     print("caculate_fft " + str(i) + " in " + str(steps))
             offset = step_offset + i * size
             feed_audio = audio[offset: offset + size, 0]
-            if i == 0:
-                print(offset)
-                print(audio)
+            # if i == 0:
+            #     print(offset)
+            #     print(audio)
 
             values = sess.run({"output": output}, feed_dict={input: feed_audio})
             output_values = values["output"]
@@ -73,28 +83,21 @@ def encode_fft(audio, size=512, steps=512, step_offset=0):
     return np.concatenate(return_values, axis=0)
 
 def decode_fft(fft):
-    input = tf.placeholder(tf.complex64, [fft.shape[1]])
-    # input = fft.shape[-1]
-
-    zeroes = tf.fill([int(fft_size / 2) - int(input.shape[0])], input[-1])
-    # zeroes = tf.cast(zeroes, tf.complex64)
-    # tf.fill()
-    fill = tf.concat([input, zeroes], axis=0)
-    print(int(fft_size / 2))
-    print(int(input.shape[0]))
-    print(fill.shape)
-
-    inverse = tf.reverse(tf.conj(fill), [0])
-    full = tf.concat([fill, inverse[-2: -1], inverse[:-1]], axis=-1)
-    output = tf.cast(tf.ifft(full), tf.float32)
 
     return_values = []
+    with tf.variable_scope("decode_fft"):
+        input = tf.placeholder(tf.complex64, [fft.shape[1]])
 
-    with tf.Session() as sess:
-        sess.run(tf.global_variables_initializer())
+        zeroes = tf.fill([int(fft_size / 2) - int(input.shape[0])], input[-1])
+        fill = tf.concat([input, zeroes], axis=0)
+
+        inverse = tf.reverse(tf.conj(fill), [0])
+        full = tf.concat([fill, inverse[-2: -1], inverse[:-1]], axis=-1)
+        output = tf.cast(tf.ifft(full), tf.float32)
+
+        sess = tf.get_default_session()
 
         steps = fft.shape[0]
-        # size = fft.shape[1]
         for i in range(steps):
             # if i % 100 == 0:
             #     print("caculate_wav " + str(i) + " in " + str(steps))
@@ -123,10 +126,13 @@ def save_fft_to_image(fft, path):
     image_values = image_values.astype('uint8')
     image = Image.fromarray(image_values)
     image.save(path)
+    # image.du
 
 def load_fft_from_image(path):
-    image = Image.open(path)
-    values = np.asarray(image, dtype="float32")
+    with open(path, 'rb') as p:
+        image = Image.open(p)
+        values = np.asarray(image, dtype="float32")
+        del image
 
     values /= 255
     values -= 0.5
@@ -140,40 +146,41 @@ def load_fft_from_image(path):
 
 def process_data():
     audio_index = 0
-    for dir_name, _, file_list in os.walk(data_source):
-        if data_contains_name is None or data_contains_name in os.path.normpath(dir_name):
-            for file_name in file_list:
-                path = dir_name + "\\" + file_name
-                # path = path.replace('\\', '/')
+    with tf.Session() as sess:
+        for dir_name, _, file_list in os.walk(data_source):
+            if data_contains_name is None or data_contains_name in os.path.normpath(dir_name):
+                for file_name in file_list:
+                    path = dir_name + "\\" + file_name
+                    # path = path.replace('\\', '/')
 
-                # print(file_name)
+                    # print(file_name)
 
-                sample_rate, audio = Helper.load_audio(path)
+                    sample_rate, audio = Helper.load_audio(path)
 
-                step_index = 0
-                # print(audio.shape[0])
+                    step_index = 0
+                    # print(audio.shape[0])
 
-                for step_offset in range(0, audio.shape[0] - fft_size, fft_size * fft_size):
-                    output_name = str(audio_index) + "-" + str(step_index)
-                    print(output_name)
-                    print(step_offset)
+                    for step_offset in range(0, audio.shape[0] - fft_size * fft_size, fft_size * fft_size):
+                        output_name = str(audio_index) + "-" + str(step_index)
+                        print(output_name)
+                        print(step_offset)
 
-                    # Image
-                    fft = encode_fft(audio, size=fft_size, steps=fft_size, step_offset=step_offset)
-                    image_output_path = data_input + "\\" + output_name + ".png"
-                    Helper.validate_directory(data_input)
-                    save_fft_to_image(fft, image_output_path)
+                        # Image
+                        fft = encode_fft(audio, size=fft_size, steps=fft_size, step_offset=step_offset)
+                        image_output_path = data_input + "\\" + output_name + ".png"
+                        Helper.validate_directory(data_input)
+                        save_fft_to_image(fft, image_output_path)
 
-                    # Reference Audio
-                    complex_values = load_fft_from_image(image_output_path)
-                    output_audio = decode_fft(complex_values)
-                    audio_output_path = data_input_reference + "\\" + output_name + ".wav"
-                    Helper.validate_directory(data_input_reference)
-                    Helper.save_audio(output_audio, audio_output_path, sample_rate)
+                        # Reference Audio
+                        complex_values = load_fft_from_image(image_output_path)
+                        output_audio = decode_fft(complex_values)
+                        audio_output_path = data_input_reference + "\\" + output_name + ".wav"
+                        Helper.validate_directory(data_input_reference)
+                        Helper.save_audio(output_audio, audio_output_path, sample_rate)
 
-                    step_index += 1
+                        step_index += 1
 
-                audio_index += 1
+                    audio_index += 1
 
 process_data()
 
