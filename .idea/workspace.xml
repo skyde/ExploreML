@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/ExploreML.py" line="274" />
+    <bookmark url="file://$PROJECT_DIR$/ExploreML.py" line="160" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4007e7a3-ef8f-4162-82e6-5defbfbcdd11" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fft_test/test.png" afterPath="$PROJECT_DIR$/fft_test/test.png" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ExploreML.py" afterPath="$PROJECT_DIR$/ExploreML.py" />
     </list>
@@ -22,13 +21,33 @@
       <file leaf-file-name="ExploreML.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ExploreML.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="528">
-              <caret line="246" column="0" lean-forward="true" selection-start-line="246" selection-start-column="0" selection-end-line="246" selection-end-column="0" />
+            <state relative-caret-position="482">
+              <caret line="97" column="0" lean-forward="true" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#10083#10099#0" expanded="false" />
-                <marker date="1500870917606" expanded="true" signature="11801:11869" ph="..." />
+                <element signature="e#6744#6760#0" expanded="false" />
+                <marker date="1500872357028" expanded="true" signature="8462:8530" ph="..." />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="shape_base.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/numpy/lib/shape_base.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="850">
+              <caret line="232" column="14" lean-forward="true" selection-start-line="232" selection-start-column="14" selection-end-line="232" selection-end-column="14" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="multiarray.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/.PyCharmCE2017.1/system/python_stubs/1626364626/numpy/core/multiarray.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="754">
+              <caret line="558" column="25" lean-forward="false" selection-start-line="558" selection-start-column="25" selection-end-line="558" selection-end-column="25" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -73,16 +92,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="pickleutil.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/ipykernel/pickleutil.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="351">
-              <caret line="266" column="30" lean-forward="true" selection-start-line="266" selection-start-column="30" selection-end-line="266" selection-end-column="30" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Helper.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Helper.py">
           <provider selected="true" editor-type-id="text-editor">
@@ -100,16 +109,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="255">
               <caret line="972" column="4" lean-forward="false" selection-start-line="972" selection-start-column="4" selection-end-line="972" selection-end-column="4" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="adam.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/tensorflow/python/training/adam.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="332">
-              <caret line="36" column="6" lean-forward="false" selection-start-line="36" selection-start-column="6" selection-end-line="36" selection-end-column="6" />
               <folding />
             </state>
           </provider>
@@ -136,7 +135,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>i</find>
       <find>step</find>
       <find>transpose</find>
       <find>sqrt</find>
@@ -166,6 +164,7 @@
       <find>512</find>
       <find>caculate_wav</find>
       <find>.write</find>
+      <find>Image.op</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -357,8 +356,8 @@
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15852335" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13550341" sideWeight="0.5064464" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13550341" sideWeight="0.49355358" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.13550341" sideWeight="0.5064464" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13550341" sideWeight="0.49355358" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -391,8 +390,8 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#10083#10099#0" expanded="false" />
-            <marker date="1500870917606" expanded="true" signature="11801:11869" ph="..." />
+            <element signature="e#6744#6760#0" expanded="false" />
+            <marker date="1500872357028" expanded="true" signature="8462:8530" ph="..." />
           </folding>
         </state>
       </provider>
@@ -413,8 +412,8 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#10083#10099#0" expanded="false" />
-            <marker date="1500870917606" expanded="true" signature="11801:11869" ph="..." />
+            <element signature="e#6744#6760#0" expanded="false" />
+            <marker date="1500872357028" expanded="true" signature="8462:8530" ph="..." />
           </folding>
         </state>
       </provider>
@@ -425,8 +424,8 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#10083#10099#0" expanded="false" />
-            <marker date="1500870917606" expanded="true" signature="11801:11869" ph="..." />
+            <element signature="e#6744#6760#0" expanded="false" />
+            <marker date="1500872357028" expanded="true" signature="8462:8530" ph="..." />
           </folding>
         </state>
       </provider>
@@ -437,8 +436,8 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#10083#10099#0" expanded="false" />
-            <marker date="1500870917606" expanded="true" signature="11801:11869" ph="..." />
+            <element signature="e#6744#6760#0" expanded="false" />
+            <marker date="1500872357028" expanded="true" signature="8462:8530" ph="..." />
           </folding>
         </state>
       </provider>
@@ -463,14 +462,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="622">
           <caret line="978" column="37" lean-forward="false" selection-start-line="978" selection-start-column="37" selection-end-line="978" selection-end-column="37" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharmCE2017.1/system/python_stubs/1626364626/numpy/core/multiarray.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="111">
-          <caret line="3424" column="23" lean-forward="false" selection-start-line="3424" selection-start-column="23" selection-end-line="3424" selection-end-column="23" />
           <folding />
         </state>
       </provider>
@@ -607,14 +598,30 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2017.1/system/python_stubs/1626364626/numpy/core/multiarray.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="754">
+          <caret line="558" column="25" lean-forward="false" selection-start-line="558" selection-start-column="25" selection-end-line="558" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/envs/tensorflow/Lib/site-packages/numpy/lib/shape_base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="850">
+          <caret line="232" column="14" lean-forward="true" selection-start-line="232" selection-start-column="14" selection-end-line="232" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ExploreML.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="528">
-          <caret line="246" column="0" lean-forward="true" selection-start-line="246" selection-start-column="0" selection-end-line="246" selection-end-column="0" />
+        <state relative-caret-position="482">
+          <caret line="97" column="0" lean-forward="true" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#10083#10099#0" expanded="false" />
-            <marker date="1500870917606" expanded="true" signature="11801:11869" ph="..." />
+            <element signature="e#6744#6760#0" expanded="false" />
+            <marker date="1500872357028" expanded="true" signature="8462:8530" ph="..." />
           </folding>
         </state>
       </provider>
