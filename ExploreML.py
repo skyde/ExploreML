@@ -215,18 +215,32 @@ def process_data():
                 size = 512
                 dfft = caculate_fft(audio, size=size, steps=size)
 
-                dfft = 0.5 + dfft * 0.02
+
                 # Convert To Image
-                dfft *= 255
-                dfft = dfft.astype('uint8')
-                # image = Image.fromarray(dfft)
+                real = np.expand_dims(dfft.real, axis=-1)
+                imag = np.expand_dims(dfft.imag, axis=-1)
+                image_values = np.concatenate([real, imag], axis=-1)
+
+                image_values = 0.5 + image_values * 0.02
+                image_values *= 255
+
+                image_values = image_values.astype('uint8')
+                # print(image_values.shape)
+                # # dfft = np.reshape(dfft, [dfft.shape[0], dfft.shape[1], 3])
+                # image = Image.fromarray(image_values)
                 # path = "fft_test/test.png"
                 # image.save(path)
-                dfft = dfft.astype('float32')
-                dfft /= 255
-                dfft = (dfft - 0.5) / 0.02
+                image_values = image_values.astype('float32')
 
-                output_wav = caculate_wav(dfft)
+                image_values /= 255
+                image_values = (image_values - 0.5) / 0.02
+
+                print(image_values.shape)
+
+                complex_values = np.array(image_values[:, :, 0], dtype=complex)
+                complex_values.imag = image_values[:, :, 1]
+
+                output_wav = caculate_wav(complex_values)
 
 
                 print("output wav " + str(output_wav.shape))
