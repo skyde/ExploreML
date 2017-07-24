@@ -219,23 +219,35 @@ def process_data():
                 # Convert To Image
                 real = np.expand_dims(dfft.real, axis=-1)
                 imag = np.expand_dims(dfft.imag, axis=-1)
-                image_values = np.concatenate([real, imag], axis=-1)
+                zeros = np.zeros(real.shape)
+                # zeros.fill(0)
+                # print(real.shape)
+                # print("zeros.shape " + str(zeros.shape))
+                image_values = np.concatenate([real, imag, zeros], axis=-1)
 
-                image_values = 0.5 + image_values * 0.02
+                encode_power = 4
+                encode_scalar = 0.001
+                image_values = image_values * encode_scalar
+                image_values = np.power(np.abs(image_values), 1 / encode_power) * np.sign(image_values)
+                image_values += 0.5
+                print("max " + str(np.max(image_values)))
+                print("min " + str(np.min(image_values)))
                 image_values *= 255
 
                 image_values = image_values.astype('uint8')
                 # print(image_values.shape)
-                # # dfft = np.reshape(dfft, [dfft.shape[0], dfft.shape[1], 3])
-                # image = Image.fromarray(image_values)
-                # path = "fft_test/test.png"
-                # image.save(path)
+                # dfft = np.reshape(dfft, [dfft.shape[0], dfft.shape[1], 3])
+                image = Image.fromarray(image_values)
+                path = "fft_test/test.png"
+                image.save(path)
                 image_values = image_values.astype('float32')
 
                 image_values /= 255
-                image_values = (image_values - 0.5) / 0.02
+                image_values -= 0.5
+                image_values = np.power(np.abs(image_values), encode_power) * np.sign(image_values)
+                image_values = image_values / encode_scalar
 
-                print(image_values.shape)
+                # print(image_values.shape)
 
                 complex_values = np.array(image_values[:, :, 0], dtype=complex)
                 complex_values.imag = image_values[:, :, 1]
@@ -243,7 +255,7 @@ def process_data():
                 output_wav = caculate_wav(complex_values)
 
 
-                print("output wav " + str(output_wav.shape))
+                # print("output wav " + str(output_wav.shape))
                 # print(output_wav)
 
                 output_wav *= 32768
