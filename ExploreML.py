@@ -24,7 +24,7 @@ data_input_reference = "data_input_reference"
 save_dir = "save"
 preview_dir = "preview"
 train_from_scratch = True
-save_progress = True
+save_progress = False
 
 # process_window = 2**15
 # preview_length = process_window
@@ -37,7 +37,9 @@ encode_power = 5
 encode_scalar = 0.0005
 fft_size = 512
 source_size = int(fft_size / 4)
-generate_size = int(source_size / 4)
+generate_size = source_size
+
+step_size = int(source_size / 16)
 
 process_data_enabled = False
 train_enabled = True
@@ -623,55 +625,119 @@ def output_to_rgb(image):
     zeros_shape = [image.shape[0], image.shape[1], image.shape[2], 3 - int(image.shape[3])]
     return tf.concat([image, tf.zeros(zeros_shape, tf.float32)], axis=-1)
 
+def create_chain(feed):
+    # step_size
+    # current_source = source
+    # current_truth = truth
+
+    list_generated = []
+    list_truth = []
+    list_predict_real = []
+    list_predict_fake = []
+
+    current = feed[:, :source_size, :, :]
+    # source = current
+
+    reuse = False
+    for offset in range(0, feed.shape[1] - source_size, step_size):
+        truth = feed[:, offset: offset + generate_size, :, :]
+
+        if offset != 0:
+            left = source[:, step_size:, :, :]
+            right = current[:, -step_size:, :, :]
+            print("left.shape " + str(left.shape))
+            print("right.shape " + str(right.shape))
+            current = tf.concat([left, right], 1)
+
+        source = current
+
+        with tf.variable_scope("generator", reuse=reuse):
+            current, layers = create_generator(current)
+            print("generator " + str(current))
+            current = create_decoder(current, layers)
+            print("decoder " + str(current))
+
+        current = tf.reshape(current, [ int(feed.shape[0]),
+                                        int(current.shape[1]),
+                                        int(current.shape[2]),
+                                        int(current.shape[3])])
+        generated = current
+
+        print("generated " + str(generated.shape))
+        print("truth " + str(truth.shape))
+
+        # GAN
+        real_input = tf.concat([source, truth], axis=3)
+        fake_input = tf.concat([source, generated], axis=3)
+
+        print("discriminator input shape " + str(real_input.shape))
+
+        with tf.variable_scope("discriminator", reuse=reuse):
+            predict_real, _ = create_generator(real_input, output_size=GAN_output_size, dropout=True,
+                                      output_channels=1, output_activated=False)
+
+        with tf.variable_scope("discriminator", reuse=True):
+            predict_fake, _ = create_generator(fake_input, output_size=GAN_output_size, dropout=True,
+                                      output_channels=1, output_activated=False)
+
+            predict_real = tf.sigmoid(predict_real)
+            predict_fake = tf.sigmoid(predict_fake)
+
+        reuse = True
+
+        list_generated.append(generated)
+        list_truth.append(truth)
+        list_predict_real.append(predict_real)
+        list_predict_fake.append(predict_fake)
+
+    combined_generated = tf.concat(list_generated, axis=0)
+    combined_truth = tf.concat(list_truth, axis=0)
+    combined_predict_real = tf.concat(list_predict_real, axis=0)
+    combined_predict_fake = tf.concat(list_predict_fake, axis=0)
+
+    return combined_generated, combined_truth, combined_predict_real, combined_predict_fake
+        # return current
+
+        # with tf.variable_scope("generator", reuse=True):
+        #     preview_current, preview_layers = create_generator(source)
+        #     print("preview generator " + str(preview_current))
+        #     preview_current = create_decoder(preview_current, preview_layers)
+        #     print("preview decoder " + str(preview_current))
+
+def get_feed_paths(directory_path):
+    paths = []
+    for dir_name, _, file_list in os.walk(directory_path):
+        for file_name in file_list:
+            path = dir_name + "\\" + file_name
+            path = path.replace('\\', '/')
+
+            paths.append(path)
+
+def get_feed_image(path):
+    with open(path, 'rb') as p:
+        image = Image.open(p)
+        data = np.asarray(image, dtype="float32")
+        del image
+
+    data /= 255
+    data = data * 2 - 1.0
+    data = data[:, :, :2]
+
+    return data
+
 def train():
     feed = tf.placeholder(tf.float32, [source_size + generate_size, source_size, 2])
     feed = tf.expand_dims(feed, axis=0)
     # feed = tf.expand_dims(feed, axis=-1)
 
-    source = feed[:, :source_size, :, :]
-    truth = feed[:, generate_size:, :, :]
+    # source = feed[:, :source_size, :, :]
+    # truth = feed[:, generate_size:, :, :]
 
-    with tf.variable_scope("generator"):
-        current, layers = create_generator(source)
-        print("generator " + str(current))
-        current = create_decoder(current, layers)
-        print("decoder " + str(current))
+    generated, truth, predict_real, predict_fake = create_chain(feed)
 
-    with tf.variable_scope("generator", reuse=True):
-        preview_current, preview_layers = create_generator(source)
-        print("preview generator " + str(preview_current))
-        preview_current = create_decoder(preview_current, preview_layers)
-        print("preview decoder " + str(preview_current))
+    print(generated.shape)
+    print(generated)
 
-    current = tf.reshape(current, [ int(source.shape[0]),
-                                    int(current.shape[1]),
-                                    int(current.shape[2]),
-                                    int(current.shape[3])])
-    generated = current
-
-    print("generated " + str(generated.shape))
-    print("truth " + str(truth.shape))
-
-    # loss = tf.reduce_mean(tf.abs(generated - truth))
-    # global_step = tf.contrib.framework.get_or_create_global_step()
-    # train_step = tf.train.AdamOptimizer(0.001).minimize(loss, global_step=global_step)
-
-    # GAN
-    real_input = tf.concat([source, truth], axis=3)
-    fake_input = tf.concat([source, generated], axis=3)
-
-    print("discriminator input shape " + str(real_input.shape))
-
-    with tf.variable_scope("discriminator"):
-        predict_real, _ = create_generator(real_input, output_size=GAN_output_size, dropout=True,
-                                  output_channels=1, output_activated=False)
-
-    with tf.variable_scope("discriminator", reuse=True):
-        predict_fake, _ = create_generator(fake_input, output_size=GAN_output_size, dropout=True,
-                                  output_channels=1, output_activated=False)
-
-        predict_real = tf.sigmoid(predict_real)
-        predict_fake = tf.sigmoid(predict_fake)
 
     # print("Create discriminator finished")
     # print("discriminator shape %s" % str(predict_real.shape))
@@ -712,6 +778,7 @@ def train():
     train_group = tf.group(generator_train, incr_global_step)
 
     # Output
+    source = feed[:, :source_size, :, :]
     source_rgb = output_to_rgb(source)
     generated_rgb = output_to_rgb(generated)
     truth_rgb = output_to_rgb(truth)
@@ -767,7 +834,6 @@ def train():
                         run = sess.run({
                             "train": train_group,
                             "global_step": global_step,
-                            # "loss": loss,
                             "source": source_rgb,
                             "generated": generated_rgb,
                             "predict_real": predict_real,
@@ -782,6 +848,7 @@ def train():
                         if step % 400 == 0:
                             preview_path = preview_dir + "\\" + "step_" + str(step)
                             generated_path = preview_path + "_generated.png"
+                            Helper.validate_directory(preview_dir)
                             Helper.save_image(run["source"], preview_path + "_source.png")
                             Helper.save_image(run["generated"], generated_path)
                             Helper.save_image(run["truth"], preview_path + "_truth.png")
