@@ -67,16 +67,9 @@ def encode_fft(audio, size=512, steps=512, step_offset=0):
 
 def decode_fft(fft):
     input = tf.placeholder(tf.complex64, [fft.shape[1]])
-    conj = tf.conj(input)
-    print(conj.shape)
-    # inverse = tf.expand_dims(conj, axis=1)
-    inverse = tf.reverse(conj, [0])
-    # inverse = tf.squeeze(inverse)
+    inverse = tf.reverse(tf.conj(input), [0])
     full = tf.concat([input, inverse[-2: -1], inverse[:-1]], axis=-1)
-    #
-    # inverse = tf.reor/
     output = tf.cast(tf.ifft(full), tf.float32)
-    # output = inverse
 
     return_values = []
 
