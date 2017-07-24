@@ -2,6 +2,7 @@ import numpy as np
 import os
 import tensorflow as tf
 import scipy.io.wavfile as wav
+from PIL import Image
 
 def validate_directory(path):
     if not os.path.exists(path):
@@ -43,3 +44,22 @@ def save_audio(audio, path, sample_rate):
     audio *= 32768
     audio = audio.astype(np.int16)
     wav.write(path, sample_rate, audio)
+
+def save_image(image, path):
+    if len(image.shape) == 4:
+        image = image[0, :, :, :]
+    image = image * 255.0
+
+    print(image.shape)
+    print(image)
+
+    image = image.astype('uint8')
+
+    print(image)
+
+    image = Image.fromarray(image)
+
+    # if resize_to != -1:
+    #     image = image.resize((resize_to, resize_to), Image.BILINEAR)
+
+    image.save(path)

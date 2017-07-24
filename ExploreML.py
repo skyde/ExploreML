@@ -481,25 +481,6 @@ def deconv(current, out_channels):
 #     return current
 #
 #
-# def saveImage(image, name, resize_to=output_size, rescale_space="negative_one_to_one"):
-#     # print(str(image.shape))
-#     # if rescale_space == "negative_one_to_one":
-#
-#     image = image * 255.0
-#     image = image.astype('uint8')
-#
-#     if image.shape[2] is 1:
-#         image = np.broadcast_to(image, (image.shape[0], image.shape[1], 3))
-#
-#     # print("save_image " + str(image.shape))
-#
-#     image = Image.fromarray(image)
-#
-#     if resize_to != -1:
-#         image = image.resize((resize_to, resize_to), Image.BILINEAR)
-#
-#     # view_path = name
-#     image.save(name)
 #
 #
 # def load_images(path, size_x, size_y):
@@ -617,7 +598,8 @@ def create_decoder(current, layers, dropout=False, output_channels=2):
 
 def output_to_rgb(image):
     image = image * 0.5 + 0.5
-    return tf.concat([image, tf.zeros(image.shape, tf.float32)], axis=-1)
+    zeros_shape = [image.shape[0], image.shape[1], image.shape[2], 3 - int(image.shape[3])]
+    return tf.concat([image, tf.zeros(zeros_shape, tf.float32)], axis=-1)
 
 def train():
     feed = tf.placeholder(tf.float32, [source_size + generate_size, source_size, 2])
@@ -652,19 +634,24 @@ def train():
     global_step = tf.contrib.framework.get_or_create_global_step()
     train_step = tf.train.AdamOptimizer(0.001).minimize(loss, global_step=global_step)
 
+    source_rgb = output_to_rgb(source)
+    generated_rgb = output_to_rgb(generated)
+    truth_rgb = output_to_rgb(truth)
+
     with tf.Session() as sess:
         with tf.name_scope("summary"):
             tf.summary.scalar("loss", loss)
 
-            tf.summary.image("source", output_to_rgb(source))
-            tf.summary.image("generated", output_to_rgb(generated))
-            tf.summary.image("truth", output_to_rgb(truth))
+            tf.summary.image("source", source_rgb)
+            tf.summary.image("generated", generated_rgb)
+            tf.summary.image("truth", truth_rgb)
         #     tf.summary.scalar("gen_loss_L1", gen_loss_L1)
         #     tf.summary.scalar("gen_loss_GAN", gen_loss_GAN)
         #     tf.summary.scalar("discriminator_loss", discriminator_loss)
 
         summary = tf.summary.merge_all()
-        writer = tf.summary.FileWriter(save_dir, graph=sess.graph)
+        writer = tf.summary.FileWriter(save_dir, graph=sess.graph, max_queue=10,
+               flush_secs=120)
         sess.run(tf.global_variables_initializer())
 
         saver = tf.train.Saver(max_to_keep=4, keep_checkpoint_every_n_hours=1)
@@ -691,43 +678,39 @@ def train():
                     # print(data.shape)
 
                     for offset in range(0, data.shape[0] - generate_size - source_size, generate_size):
-                        # print(offset)
 
                         feed_data = data[offset: offset + source_size + generate_size]
                         feed_data = np.expand_dims(feed_data, axis=0)
 
                         step = global_step.eval()
-                    #
-                    #     input_audio = np.copy(audio)
-                    #     input_audio = input_audio[offset:offset + process_window + batch_size, :]
-                    #     # print("offset " + str(offset))
-                    #     # print(input_audio.shape)
-                    #
-                    #     # train_step.run(feed_dict={raw_input: input_audio})
+
                         run = sess.run({
                             "train_step": train_step,
                             "global_step": global_step,
                             "loss": loss,
-                            "source": source,
-                            "truth": truth,
-                            "generated": generated,
+                            "source": source_rgb,
+                            "generated": generated_rgb,
+                            "truth": truth_rgb,
                             "summary": summary
                         }, feed_dict={feed: feed_data})
 
                         if step % 100 == 0:
                             print("step " + str(step))
 
+                        if step % 400 == 0:
+                            preview_path = preview_dir + "\\" + "step_"
+                            Helper.save_image(run["source"], preview_path + "_source.png")
+                            Helper.save_image(run["generated"], preview_path + "_generated.png")
+                            Helper.save_image(run["truth"], preview_path + "_truth.png")
+
                         if step % 10 == 0:
                             print(run["loss"])
                             writer.add_summary(run["summary"], step)
 
-                        # print("target " + str(run["target"][0, 0, 0]))
-                        #     print("generated_output " + str(run["generated"][0, 0, 0]))
-                    #
-                    #     if step % save_interval == 0:
-                    #         Helper.validate_directory(save_dir)
-                    #         if save_progress:
-                    #             _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
+                        if step % save_interval == 0:
+                            Helper.validate_directory(save_dir)
+                            if save_progress:
+                                _ = saver.save(sess, save_dir + "/model.ckpt", global_step=global_step)
                     #
                     #     if step > 0 and step % preview_interval == 0:
                     #         preview_start_offset = 12 * 22400
