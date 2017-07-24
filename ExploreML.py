@@ -34,8 +34,9 @@ preview_interval = 1000
 
 encode_power = 4
 encode_scalar = 0.001
+fft_size = 512
 
-def encode_fft(audio, size=512, steps=512, start_offset=0):
+def encode_fft(audio, size=512, steps=512, step_offset=0):
 
     input = tf.placeholder(tf.float32, [size])
     output = tf.fft(tf.cast(input, tf.complex64))
@@ -48,8 +49,8 @@ def encode_fft(audio, size=512, steps=512, start_offset=0):
         for i in range(steps):
             if i % 100 == 0:
                 print("caculate_fft " + str(i) + " in " + str(steps))
-            offset = start_offset + i * size
-            feed_audio = audio[offset:offset + size, 0]
+            offset = step_offset + i * size
+            feed_audio = audio[offset: offset + size, 0]
 
             values = sess.run({"output": output}, feed_dict={input: feed_audio})
             output_values = values["output"]
@@ -85,9 +86,45 @@ def decode_fft(fft):
 
 def load_audio(path):
     sample_rate, audio = wav.read(path)
-    audio = audio.astype(np.float64)
+    audio = audio.astype(np.float32)
     audio /= 32768
     return sample_rate, audio[:, 0:1]
+
+def save_audio(audio, path, sample_rate):
+    audio *= 32768
+    audio = audio.astype(np.int16)
+    wav.write(path, sample_rate, audio)
+
+def save_fft_to_image(fft, path):
+    real = np.expand_dims(fft.real, axis=-1)
+    imag = np.expand_dims(fft.imag, axis=-1)
+    zeros = np.zeros(real.shape)
+    image_values = np.concatenate([real, imag, zeros], axis=-1)
+
+    image_values = image_values * encode_scalar
+    image_values = np.power(np.abs(image_values), 1 / encode_power) * np.sign(image_values)
+    image_values += 0.5
+    # print("max " + str(np.max(image_values)))
+    # print("min " + str(np.min(image_values)))
+    image_values *= 255
+
+    image_values = image_values.astype('uint8')
+    image = Image.fromarray(image_values)
+    image.save(path)
+
+def load_fft_from_image(path):
+    image = Image.open(path)
+    values = np.asarray(image, dtype="float32")
+
+    values /= 255
+    values -= 0.5
+    values = np.power(np.abs(values), encode_power) * np.sign(values)
+    values = values / encode_scalar
+
+    complex_values = np.array(values[:, :, 0], dtype=complex)
+    complex_values.imag = values[:, :, 1]
+
+    return complex_values
 
 def process_data():
     for dir_name, _, file_list in os.walk(data_source):
@@ -99,60 +136,15 @@ def process_data():
                 # Helper.validate_directory(data_input)
 
                 sample_rate, audio = load_audio(path)
+                fft = encode_fft(audio, size=fft_size, steps=fft_size, step_offset=0)
+                output_path = "fft_test/test.png"
+                save_fft_to_image(fft, output_path)
 
-                size = 512
-                dfft = encode_fft(audio, size=size, steps=size)
-
-
-                # Convert To Image
-                real = np.expand_dims(dfft.real, axis=-1)
-                imag = np.expand_dims(dfft.imag, axis=-1)
-                zeros = np.zeros(real.shape)
-                # zeros.fill(0)
-                # print(real.shape)
-                # print("zeros.shape " + str(zeros.shape))
-                image_values = np.concatenate([real, imag, zeros], axis=-1)
-
-                image_values = image_values * encode_scalar
-                image_values = np.power(np.abs(image_values), 1 / encode_power) * np.sign(image_values)
-                image_values += 0.5
-                print("max " + str(np.max(image_values)))
-                print("min " + str(np.min(image_values)))
-                image_values *= 255
-
-                image_values = image_values.astype('uint8')
-                # print(image_values.shape)
-                # dfft = np.reshape(dfft, [dfft.shape[0], dfft.shape[1], 3])
-                image = Image.fromarray(image_values)
-                path = "fft_test/test.png"
-                image.save(path)
-                image = None
-                image = Image.open(path)
-                image_values = np.asarray(image, dtype="float32")
-                # image_values = image_values.astype('float32')
-
-                image_values /= 255
-                image_values -= 0.5
-                image_values = np.power(np.abs(image_values), encode_power) * np.sign(image_values)
-                image_values = image_values / encode_scalar
-
-                # print(image_values.shape)
-
-                complex_values = np.array(image_values[:, :, 0], dtype=complex)
-                complex_values.imag = image_values[:, :, 1]
+                complex_values = load_fft_from_image(output_path)
 
                 output_wav = decode_fft(complex_values)
 
-
-                # print("output wav " + str(output_wav.shape))
-                # print(output_wav)
-
-                output_wav *= 32768
-                print(output_wav)
-                output_wav = output_wav.astype(np.int16)
-                print(output_wav)
-                path = "fft_test/test_audio.wav"
-                wav.write(path, sample_rate, output_wav)
+                save_audio(output_wav, "fft_test/test_audio.wav", sample_rate)
 
                 # print(dfft)
 

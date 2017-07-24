@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/ExploreML.py" line="160" />
+    <bookmark url="file://$PROJECT_DIR$/ExploreML.py" line="152" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4007e7a3-ef8f-4162-82e6-5defbfbcdd11" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/skyde.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ExploreML.py" afterPath="$PROJECT_DIR$/ExploreML.py" />
     </list>
@@ -21,12 +22,13 @@
       <file leaf-file-name="ExploreML.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ExploreML.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="482">
-              <caret line="97" column="0" lean-forward="true" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
+            <state relative-caret-position="639">
+              <caret line="97" column="33" lean-forward="true" selection-start-line="97" selection-start-column="33" selection-end-line="97" selection-end-column="33" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#6744#6760#0" expanded="false" />
-                <marker date="1500872357028" expanded="true" signature="8462:8530" ph="..." />
+                <element signature="e#6087#6103#0" expanded="false" />
+                <element signature="e#8536#8537#0" expanded="false" />
+                <marker date="1500873259204" expanded="true" signature="7805:7873" ph="..." />
               </folding>
             </state>
           </provider>
@@ -135,7 +137,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>step</find>
       <find>transpose</find>
       <find>sqrt</find>
       <find>deconv</find>
@@ -165,6 +166,7 @@
       <find>caculate_wav</find>
       <find>.write</find>
       <find>Image.op</find>
+      <find>start_o</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -390,8 +392,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#6744#6760#0" expanded="false" />
-            <marker date="1500872357028" expanded="true" signature="8462:8530" ph="..." />
+            <element signature="e#6087#6103#0" expanded="false" />
+            <element signature="e#8536#8537#0" expanded="false" />
+            <marker date="1500873259204" expanded="true" signature="7805:7873" ph="..." />
           </folding>
         </state>
       </provider>
@@ -412,8 +415,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#6744#6760#0" expanded="false" />
-            <marker date="1500872357028" expanded="true" signature="8462:8530" ph="..." />
+            <element signature="e#6087#6103#0" expanded="false" />
+            <element signature="e#8536#8537#0" expanded="false" />
+            <marker date="1500873259204" expanded="true" signature="7805:7873" ph="..." />
           </folding>
         </state>
       </provider>
@@ -424,8 +428,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#6744#6760#0" expanded="false" />
-            <marker date="1500872357028" expanded="true" signature="8462:8530" ph="..." />
+            <element signature="e#6087#6103#0" expanded="false" />
+            <element signature="e#8536#8537#0" expanded="false" />
+            <marker date="1500873259204" expanded="true" signature="7805:7873" ph="..." />
           </folding>
         </state>
       </provider>
@@ -436,8 +441,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#6744#6760#0" expanded="false" />
-            <marker date="1500872357028" expanded="true" signature="8462:8530" ph="..." />
+            <element signature="e#6087#6103#0" expanded="false" />
+            <element signature="e#8536#8537#0" expanded="false" />
+            <marker date="1500873259204" expanded="true" signature="7805:7873" ph="..." />
           </folding>
         </state>
       </provider>
@@ -616,12 +622,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ExploreML.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="482">
-          <caret line="97" column="0" lean-forward="true" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
+        <state relative-caret-position="639">
+          <caret line="97" column="33" lean-forward="true" selection-start-line="97" selection-start-column="33" selection-end-line="97" selection-end-column="33" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#6744#6760#0" expanded="false" />
-            <marker date="1500872357028" expanded="true" signature="8462:8530" ph="..." />
+            <element signature="e#6087#6103#0" expanded="false" />
+            <element signature="e#8536#8537#0" expanded="false" />
+            <marker date="1500873259204" expanded="true" signature="7805:7873" ph="..." />
           </folding>
         </state>
       </provider>
