@@ -35,12 +35,15 @@ preview_interval = 1000
 encode_power = 4
 encode_scalar = 0.001
 fft_size = 512
+save_frequencies = fft_size / 4
 
 def encode_fft(audio, size=512, steps=512, step_offset=0):
 
     input = tf.placeholder(tf.float32, [size])
     output = tf.fft(tf.cast(input, tf.complex64))
     output = output[:int(size / 2)]
+
+    output = output[:int(save_frequencies)]
 
     return_values = []
 
@@ -67,8 +70,18 @@ def encode_fft(audio, size=512, steps=512, step_offset=0):
 
 def decode_fft(fft):
     input = tf.placeholder(tf.complex64, [fft.shape[1]])
-    inverse = tf.reverse(tf.conj(input), [0])
-    full = tf.concat([input, inverse[-2: -1], inverse[:-1]], axis=-1)
+    # input = fft.shape[-1]
+
+    zeroes = tf.fill([int(fft_size / 2) - int(input.shape[0])], input[-1])
+    # zeroes = tf.cast(zeroes, tf.complex64)
+    # tf.fill()
+    fill = tf.concat([input, zeroes], axis=0)
+    print(int(fft_size / 2))
+    print(int(input.shape[0]))
+    print(fill.shape)
+
+    inverse = tf.reverse(tf.conj(fill), [0])
+    full = tf.concat([fill, inverse[-2: -1], inverse[:-1]], axis=-1)
     output = tf.cast(tf.ifft(full), tf.float32)
 
     return_values = []
@@ -130,9 +143,10 @@ def process_data():
 
                 # Helper.validate_directory(data_input)
 
-                sample_rate, audio = Helper.load_audio(path)
-                fft = encode_fft(audio, size=fft_size, steps=fft_size, step_offset=0)
                 output_path = "fft_test/test.png"
+                sample_rate, audio = Helper.load_audio(path)
+
+                fft = encode_fft(audio, size=fft_size, steps=fft_size, step_offset=0)
                 save_fft_to_image(fft, output_path)
 
                 complex_values = load_fft_from_image(output_path)
