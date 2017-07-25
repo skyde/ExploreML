@@ -9,7 +9,7 @@ import Helper
 
 train_batch_size = 128
 test_batch_size = 2
-number_generator_filters = 32
+number_generator_filters = 16
 
 max_epochs = 1000000
 
@@ -21,8 +21,6 @@ data_test = "data_test"
 
 save_dir = "save"
 preview_dir = "preview"
-train_from_scratch = False
-save_progress = True
 
 save_interval = 100
 preview_interval = 10
@@ -35,15 +33,18 @@ generate_size = source_size
 
 step_size = int(source_size)
 
-process_data_enabled = False
-train_enabled = True
-
-GAN_output_size = 32
+GAN_output_size = 8
 epsilon = 1e-12
 learning_rate = 0.0002
 learning_rate_L1 = 100
 learning_rate_GAN = 1
 beta1 = 0.5
+
+process_data_enabled = False
+train_enabled = True
+
+train_from_scratch = True
+save_progress = True
 
 encode_fft_reuse = False
 def encode_fft(audio, size=512, steps=512, step_offset=0):
@@ -257,7 +258,7 @@ def caculate_layer_depth(size):
 
     return 8 * number_generator_filters
 
-def create_generator(current, dropout=True, output_size=1, output_channels=None, output_activated=True):
+def create_generator(current, state, dropout=True, output_size=1, output_channels=None, output_activated=True):
     print("generator input " + str(current.shape))
 
     layers = []
@@ -283,8 +284,10 @@ def create_generator(current, dropout=True, output_size=1, output_channels=None,
 
             print("generator layer " + str(current.shape))
 
-            if dropout and current.shape[1] <= 32:
-                current = tf.nn.dropout(current, 0.4)
+            if dropout and current.shape[1] <= 64:
+                current = tf.cond(tf.equal(state, "train"),
+                                  lambda: tf.nn.dropout(current, 0.4),
+                                  lambda: current)
 
             layers.append(current)
 
@@ -292,7 +295,7 @@ def create_generator(current, dropout=True, output_size=1, output_channels=None,
 
     return current, layers
 
-def create_decoder(current, layers, dropout=False, output_channels=2):
+def create_decoder(current, layers, dropout=False, output_channels=3):
     print("decoder input " + str(current.shape))
 
     layer_index = 0
@@ -321,9 +324,12 @@ def create_decoder(current, layers, dropout=False, output_channels=2):
 
 def output_to_rgb(image):
     image = image * 0.5 + 0.5
-    return tf.pad(image, [[0, 0], [0, 0], [0, 0], [0, 1]])
 
-def create_chain(feed):
+    return image
+
+    # return tf.pad(image, [[0, 0], [0, 0], [0, 0], [0, 1]])
+
+def create_chain(feed, state):
 
     list_generated = []
     list_truth = []
@@ -348,9 +354,9 @@ def create_chain(feed):
 
         with tf.variable_scope("generator", reuse=reuse):
             generator_input = tf.concat([current, source], axis=3)
-            current, layers = create_generator(generator_input)
+            current, layers = create_generator(generator_input, state, dropout=True)
             print("generator " + str(current))
-            current = create_decoder(current, layers)
+            current = create_decoder(current, layers, output_channels=source.shape[-1])
             print("decoder " + str(current))
 
         # current = tf.reshape(current, [ int(feed.shape[0]),
@@ -369,11 +375,11 @@ def create_chain(feed):
         print("discriminator input shape " + str(real_input.shape))
 
         with tf.variable_scope("discriminator", reuse=reuse):
-            predict_real, _ = create_generator(real_input, output_size=GAN_output_size, dropout=True,
+            predict_real, _ = create_generator(real_input, state, output_size=GAN_output_size, dropout=True,
                                       output_channels=1, output_activated=False)
 
         with tf.variable_scope("discriminator", reuse=True):
-            predict_fake, _ = create_generator(fake_input, output_size=GAN_output_size, dropout=True,
+            predict_fake, _ = create_generator(fake_input, state, output_size=GAN_output_size, dropout=True,
                                       output_channels=1, output_activated=False)
 
             predict_real = tf.sigmoid(predict_real)
@@ -464,7 +470,20 @@ def train():
 
     feed = tf.cond(tf.equal(state, "train"), lambda: train_batch, lambda: test_batch)
 
-    generated, truth, predict_real, predict_fake = create_chain(feed)
+    spatial = tf.lin_space(-0.5, 0.5, source_size)
+    spatial = tf.expand_dims(spatial, axis=0)
+    spatial = tf.expand_dims(spatial, axis=1)
+    spatial = tf.expand_dims(spatial, axis=3)
+    spatial = tf.tile(spatial, [tf.shape(feed)[0], tf.shape(feed)[1], 1, 1])
+    feed = tf.concat([feed, spatial], axis=3)
+
+    # feed = tf.pow(tf.abs(feed), encode_power) * tf.sign(feed)
+    # feed = tf.pow(tf.abs(feed), 1 / 10) * tf.sign(feed)
+
+    # image_values = np.power(np.abs(image_values), 1 / encode_power) * np.sign(image_values)
+    # values = np.power(np.abs(values), encode_power) * np.sign(values)
+
+    generated, truth, predict_real, predict_fake = create_chain(feed, state)
 
     with tf.name_scope("discriminator_loss"):
         discriminator_loss = tf.reduce_mean(-(tf.log(predict_real + epsilon) + tf.log(1 - predict_fake + epsilon)))
@@ -494,6 +513,9 @@ def train():
     incr_global_step = tf.assign(global_step, global_step + 1)
 
     train_group = tf.group(generator_train, incr_global_step)
+
+    # generated = tf.pow(tf.abs(generated), 10) * tf.sign(generated)
+    # generated = tf.pow(tf.abs(generated), 1.0 / encode_power) * tf.sign(generated)
 
     # Output
     source = feed[:, :source_size, :, :]

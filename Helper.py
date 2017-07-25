@@ -79,5 +79,6 @@ def image_batch(path, size_y, size_x, batch_size, channels=3):
         images = images[:, :, 0:channels]
     images = tf.cast(images, tf.float32)
     images = images / 255.0
+    image = images * 2.0 - 1.0
 
     return tf.train.batch([images], batch_size=batch_size)
