@@ -12,19 +12,19 @@ import math
 # output_size = 128
 batch_size = 256
 max_preview_export = 16
-number_generator_filters = 32
+number_generator_filters = 128
 
 max_epochs = 4000000
 
 data_raw = "data_raw"
-data_contains_name = "piano"
+data_contains_name = None
 data_train = "data_train"
 data_train_reference = "data_train_reference"
 data_test = "data_test"
 
 save_dir = "save"
 preview_dir = "preview"
-train_from_scratch = True
+train_from_scratch = False
 save_progress = True
 
 # process_window = 2**15
@@ -35,17 +35,16 @@ save_interval = 500
 preview_interval = 1000
 
 encode_power = 5
-encode_scalar = 0.0005
-fft_size = 512
-source_size = int(fft_size / 4)
+encode_scalar = 0.03
+fft_size = 256
+source_size = int(fft_size / 2)
 generate_size = source_size
 
 step_size = int(source_size)
 
-process_data_enabled = False
+process_data_enabled = True
 train_enabled = True
 
-# try 8
 GAN_output_size = 32
 epsilon = 1e-12
 learning_rate = 0.0002
@@ -108,7 +107,7 @@ def fft_to_audio(fft):
     with tf.variable_scope("fft_to_audio", reuse=fft_to_audio_init):
         input = tf.placeholder(tf.complex64, [fft.shape[1]])
 
-        zeroes = tf.fill([int(fft_size / 2) - int(input.shape[0])], input[-1])
+        zeroes = tf.fill([int(fft_size / 2) - int(input.shape[0])], input[-1] * 0)
         fill = tf.concat([input, zeroes], axis=0)
 
         inverse = tf.reverse(tf.conj(fill), [0])
@@ -139,11 +138,19 @@ def save_fft_to_image(fft, path):
     zeros = np.zeros(real.shape)
     image_values = np.concatenate([real, imag, zeros], axis=-1)
 
+    print("pre max " + str(np.max(image_values)))
+    print("pre min " + str(np.min(image_values)))
     image_values = image_values * encode_scalar
     image_values = np.power(np.abs(image_values), 1 / encode_power) * np.sign(image_values)
+
+    print("post max " + str(np.max(image_values)))
+    print("post min " + str(np.min(image_values)))
+
+    image_values /= 2
     image_values += 0.5
-    print("max " + str(np.max(image_values)))
-    print("min " + str(np.min(image_values)))
+    print("input max " + str(np.max(image_values)))
+    print("input min " + str(np.min(image_values)))
+
     image_values *= 255
 
     image_values = image_values.astype('uint8')
@@ -159,6 +166,7 @@ def load_fft_from_image(path):
 
     values /= 255
     values -= 0.5
+    values *= 2
     values = np.power(np.abs(values), encode_power) * np.sign(values)
     values = values / encode_scalar
 
@@ -173,6 +181,7 @@ def save_image_as_audio(fft, path, sample_rate):
 
 def process_data():
     audio_index = 0
+    i = 0
     with tf.Session() as sess:
         for dir_name, _, file_list in os.walk(data_raw):
             if data_contains_name is None or data_contains_name in os.path.normpath(dir_name):
@@ -189,13 +198,19 @@ def process_data():
 
                     for step_offset in range(0, audio.shape[0] - fft_size * fft_size, fft_size * fft_size):
                         output_name = str(audio_index) + "-" + str(step_index)
-                        print(output_name)
-                        print(step_offset)
+
+                        folder = data_train
+
+                        if i % 5 == 0:
+                            folder = data_test
+
+                        # print(output_name)
+                        # print(step_offset)
 
                         # Image
                         fft = encode_fft(audio, size=fft_size, steps=fft_size, step_offset=step_offset)
-                        image_output_path = data_train + "\\" + output_name + ".png"
-                        Helper.validate_directory(data_train)
+                        image_output_path = folder + "\\" + output_name + ".png"
+                        Helper.validate_directory(folder)
                         save_fft_to_image(fft, image_output_path)
 
                         # Reference Audio
@@ -207,6 +222,7 @@ def process_data():
                         # Helper.save_audio(output_audio, audio_output_path, sample_rate)
 
                         step_index += 1
+                        i += 1
 
                     audio_index += 1
 
