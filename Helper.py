@@ -61,3 +61,23 @@ def save_image(image, path):
     #     image = image.resize((resize_to, resize_to), Image.BILINEAR)
 
     image.save(path)
+
+def image_batch(path, size_y, size_x, batch_size, channels=3):
+    file_names = tf.train.match_filenames_once(os.path.join(path, "*.*"))
+
+    print(file_names)
+
+    filename_queue = tf.train.string_input_producer(file_names, shuffle=False, seed=42)
+
+    # print(filename_queue)
+
+    image_reader = tf.WholeFileReader()
+    _, image_file = image_reader.read(filename_queue)
+    images = tf.image.decode_png(image_file)
+    images.set_shape((size_y, size_x, 3))
+    if channels != 3:
+        images = images[:, :, 0:channels]
+    images = tf.cast(images, tf.float32)
+    images = images / 255.0
+
+    return tf.train.batch([images], batch_size=batch_size)
